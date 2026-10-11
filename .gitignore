@@ -1,0 +1,40 @@
+# Visual Studio / local IDE state
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# .NET build outputs
+**/[Bb]in/
+**/[Oo]bj/
+[Aa]rtifacts/
+[Pp]ackages/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Local backups and temporary files
+*.tmp
+*.bak
+*.log
+*.dmp
+~$*
+
+# Generated UI previews; keep the smoke-check source
+work/previews/
+
+# Local secrets and publish profiles
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pubxml.user
+
+# OS metadata
+Thumbs.db
+Desktop.ini
+.DS_Store

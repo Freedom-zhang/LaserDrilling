@@ -1,0 +1,24 @@
+<UserControl x:Class="LaserDrilling.Hmi.Views.SplashView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/" prism:ViewModelLocator.AutoWireViewModel="True"
+    Loaded="OnLoaded" Unloaded="OnUnloaded" AutomationProperties.Name="公司启动页">
+    <Grid Background="{DynamicResource PageBrush}">
+        <Border Height="5" Background="{DynamicResource AccentBrush}" VerticalAlignment="Top" />
+        <Path Data="M0,160 L160,0 M0,260 L260,0 M0,360 L360,0" Stroke="{DynamicResource LineBrush}" StrokeThickness="1" Width="360" Height="360" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False" />
+        <Path Data="M0,160 L160,0 M0,260 L260,0 M0,360 L360,0" Stroke="{DynamicResource LineBrush}" StrokeThickness="1" Width="360" Height="360" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsHitTestVisible="False" />
+        <TextBlock Text="LASER PROCESSING / HMI" Margin="38,30" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Top" />
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,18">
+            <Image Source="{StaticResource CompanyLogo}" Width="116" Height="116" Margin="0,0,0,22" />
+            <TextBlock Text="{Binding Brand.CompanyName}" FontSize="38" FontWeight="SemiBold" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding Brand.CompanyEnglishName}" FontSize="16" FontFamily="Consolas" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <Border Height="1" Width="48" Background="#A8BBC7" Margin="0,28,0,22" />
+            <TextBlock Text="{DynamicResource Text.Product}" FontSize="17" HorizontalAlignment="Center" />
+            <ProgressBar Height="3" Width="210" Margin="0,35,0,15" IsIndeterminate="True" Foreground="{DynamicResource AccentBrush}" Background="#E1E9EE" BorderThickness="0" />
+            <TextBlock Text="{Binding Status}" FontSize="12" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" />
+        </StackPanel>
+        <Grid VerticalAlignment="Bottom" Margin="38,0,38,26">
+            <TextBlock Text="{DynamicResource Text.Tagline}" FontSize="11" Foreground="{DynamicResource MutedBrush}" />
+            <TextBlock Text="{DynamicResource Text.DemoVersion}" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource MutedBrush}" />
+        </Grid>
+    </Grid>
+</UserControl>

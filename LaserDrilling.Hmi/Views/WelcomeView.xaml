@@ -1,0 +1,22 @@
+<UserControl x:Class="LaserDrilling.Hmi.Views.WelcomeView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:prism="http://prismlibrary.com/" prism:ViewModelLocator.AutoWireViewModel="True" Loaded="OnLoaded">
+ <Grid Background="{DynamicResource PageBrush}">
+  <Grid.RowDefinitions><RowDefinition Height="80"/><RowDefinition/><RowDefinition Height="40"/></Grid.RowDefinitions>
+  <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1" Padding="26,0">
+   <DockPanel>
+    <Button DockPanel.Dock="Right" Content="{DynamicResource Text.SignOut}" Width="100" Command="{Binding SignOutCommand}" Style="{StaticResource SecondaryButton}"/>
+    <TextBlock DockPanel.Dock="Right" Text="{Binding UserName}" VerticalAlignment="Center" Margin="0,0,24,0"/>
+    <Image Source="{StaticResource CompanyLogo}" Width="44" Height="44" Margin="0,0,16,0" DockPanel.Dock="Left"/>
+    <TextBlock Text="{DynamicResource Text.Product}" VerticalAlignment="Center" FontSize="20" FontWeight="SemiBold"/>
+   </DockPanel>
+  </Border>
+  <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+   <TextBlock Text="{DynamicResource Text.Success}" FontSize="30" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+   <TextBlock Text="{DynamicResource Text.Ready}" FontSize="16" Margin="0,18,0,0" HorizontalAlignment="Center"/>
+   <TextBlock Text="{DynamicResource Text.NextModules}" Foreground="{DynamicResource MutedBrush}" FontSize="13" Margin="0,14,0,0"/>
+  </StackPanel>
+  <TextBlock Grid.Row="2" Text="{DynamicResource Text.Offline}" Margin="26,0" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" FontSize="12"/>
+ </Grid>
+</UserControl>
