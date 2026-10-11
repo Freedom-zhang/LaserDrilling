@@ -24,6 +24,7 @@ internal static class Program
                 var timer = Stopwatch.StartNew();
                 await Task.Delay(100);
                 Require(Find<SplashView>(window) != null, "Startup view visible");
+                Require(Find<HandyControl.Controls.LoadingLine>(window)?.IsRunning == true, "HandyControl loading animation active");
                 Capture(window, "startup-preview.png");
                 while (Find<LoginView>(window) == null && timer.Elapsed.TotalSeconds < 5) await Task.Delay(20);
                 var login = Find<LoginView>(window);
@@ -37,11 +38,14 @@ internal static class Program
                 Require(vm.HasError, "Empty password rejected");
                 Click(login, "中文 / EN");
                 Require(vm.ErrorMessage == "Enter your password." && vm.LoginCaption == "Sign in", "Existing validation and command captions translate immediately");
+                Require(HandyControl.Tools.ConfigHelper.Instance.Lang.IetfLanguageTag == "en-us", "HandyControl language synchronized");
                 Click(login, "Dark");
                 await Task.Delay(100);
                 Require(((SolidColorBrush)app.FindResource("SurfaceBrush")).Color == (Color)ColorConverter.ConvertFromString("#203342"), "Dark palette applied");
+                Require(app.Resources.MergedDictionaries[0].Source.OriginalString.EndsWith("SkinDark.xaml"), "HandyControl dark skin synchronized");
                 Capture(window, "login-dark-english.png");
                 App.Appearance.SetTheme(false);
+                Require(app.Resources.MergedDictionaries[0].Source.OriginalString.EndsWith("SkinDefault.xaml"), "HandyControl light skin restored");
                 await Task.Delay(50);
                 Capture(window, "login-light-english.png");
                 App.Appearance.SetLanguage(false);

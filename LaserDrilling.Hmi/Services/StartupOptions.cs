@@ -6,7 +6,7 @@ namespace LaserDrilling.Hmi.Services
 {
     public sealed class StartupOptions
     {
-        public string CompanyName { get; set; } = "星驰激光";
+        public string CompanyName { get; set; } = "XX激光";
         public string CompanyEnglishName { get; set; } = "STAR LASER";
         public string ProductName { get; set; } = "激光打孔控制系统";
         public double SplashDurationSeconds { get; set; } = 2;
@@ -21,7 +21,7 @@ namespace LaserDrilling.Hmi.Services
                     : new StartupOptions();
                 if (!double.IsFinite(options.SplashDurationSeconds) || options.SplashDurationSeconds < 0 || options.SplashDurationSeconds > 30)
                     options.SplashDurationSeconds = 2;
-                if (string.IsNullOrWhiteSpace(options.CompanyName)) options.CompanyName = "星驰激光";
+                if (string.IsNullOrWhiteSpace(options.CompanyName)) options.CompanyName = "XX激光";
                 if (string.IsNullOrWhiteSpace(options.CompanyEnglishName)) options.CompanyEnglishName = "STAR LASER";
                 if (string.IsNullOrWhiteSpace(options.ProductName)) options.ProductName = "激光打孔控制系统";
                 return options;

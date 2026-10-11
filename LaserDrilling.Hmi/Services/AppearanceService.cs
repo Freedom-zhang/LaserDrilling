@@ -47,6 +47,7 @@ namespace LaserDrilling.Hmi.Services
         {
             IsEnglish = english;
             CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(english ? "en-US" : "zh-CN");
+            HandyControl.Tools.ConfigHelper.Instance.SetLang(english ? "en-US" : "zh-CN");
             foreach (var pair in _texts) Application.Current.Resources["Text." + pair.Key] = Text(pair.Key);
             Application.Current.Resources["Text.ThemeChoice"] = IsDark ? (english ? "Light" : "浅色") : (english ? "Dark" : "深色");
             RaisePropertyChanged(nameof(IsEnglish));
@@ -54,6 +55,19 @@ namespace LaserDrilling.Hmi.Services
         public void SetTheme(bool dark)
         {
             IsDark = dark;
+            // Replace only the HandyControl skin, retaining the app's own resource precedence.
+            var dictionaries = Application.Current.Resources.MergedDictionaries;
+            for (var i = 0; i < dictionaries.Count; i++)
+            {
+                var source = dictionaries[i].Source?.OriginalString;
+                if (source != null && source.Contains("HandyControl;component/Themes/Skin"))
+                {
+                    var skin = dark ? "SkinDark" : "SkinDefault";
+                    var uri = new System.Uri($"pack://application:,,,/HandyControl;component/Themes/{skin}.xaml");
+                    if (dictionaries[i].Source != uri) dictionaries[i] = new ResourceDictionary { Source = uri };
+                    break;
+                }
+            }
             SetBrush("InkBrush", dark ? "#E4EDF3" : "#203D52");
             SetBrush("MutedBrush", dark ? "#A1B4C3" : "#6B7E8C");
             SetBrush("AccentBrush", dark ? "#208A98" : "#187F8D");

@@ -1,6 +1,6 @@
 # 公司标识与启动流程
 
-公司名称暂用“星驰激光”。本目录 company-logo.svg 是原创临时标识，不是该公司官方商标；可替换为正式授权素材。
+公司名称暂用“XX激光”。本目录 company-logo.svg 是原创临时标识，不是该公司官方商标；可替换为正式授权素材。
 
 - SVG 原稿：Assets/Brand/company-logo.svg。
 - 透明 PNG：Assets/Brand/company-logo.png，256 × 256，便于其他页面或文档复用。

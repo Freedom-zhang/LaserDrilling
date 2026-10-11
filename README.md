@@ -34,6 +34,7 @@
 | C# / .NET 8 | 应用开发与基础运行环境 |
 | WPF / XAML | 桌面界面、数据绑定、样式与资源 |
 | Prism.DryIoc **8.1.97** | MVVM、命令、依赖注入及 Region 页面导航 |
+| HandyControl **3.5.1** | WPF 控件与主题资源，启动页使用 LoadingLine 加载动画 |
 | DryIoc（由 Prism.DryIoc 引入） | 依赖注入容器 |
 | System.Text.Json（.NET 内置） | 读取启动配置 |
 | WPF DynamicResource | 运行时切换语言文案和主题颜色 |
@@ -98,11 +99,32 @@ dotnet run --project work/StartupSmoke/StartupSmoke.csproj
 
 ## 配置与资源复用
 
+### HandyControl 接入
+
+使用官方 NuGet 包 `HandyControl`。`App.xaml` 先加载控件库的 `SkinDefault.xaml` 和 `Theme.xaml`，再加载项目自己的资源以保留现有界面样式。
+
+`AppearanceService` 统一同步控件库与应用的深浅主题、中英文设置。新增控件不需要另建主题管理器；项目自定义控件样式仍优先于库的默认样式。
+
+在页面中添加命名空间即可使用：
+
+```xml
+xmlns:hc="https://handyorg.github.io/handycontrol"
+```
+
+```xml
+<hc:LoadingLine Width="210" Height="8"
+                Foreground="{DynamicResource AccentBrush}" />
+```
+
+参考：[HandyControl 官方文档](https://handyorg.github.io/handycontrol/quick_start/)。
+
+### 启动配置
+
 编辑 `LaserDrilling.Hmi/Configuration/startup.json`：
 
 ```json
 {
-  "CompanyName": "星驰激光",
+  "CompanyName": "XX激光",
   "CompanyEnglishName": "STAR LASER",
   "ProductName": "激光打孔控制系统",
   "SplashDurationSeconds": 2
