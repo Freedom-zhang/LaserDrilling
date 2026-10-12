@@ -4,8 +4,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using LaserDrilling.Hmi.ViewModels;
 
-namespace LaserDrilling.Hmi.Views
+namespace LaserDrilling.Hmi.Components
 {
+    /// <summary>
+    /// 显示设备控制面板，处理 Z 轴按住点动、鼠标释放和窗口失焦等界面事件。
+    /// </summary>
     public partial class ControlConsole : UserControl
     {
         private Window _owner;

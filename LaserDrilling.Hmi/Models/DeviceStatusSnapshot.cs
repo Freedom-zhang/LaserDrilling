@@ -1,6 +1,8 @@
 namespace LaserDrilling.Hmi.Models
 {
-    // Demonstration equipment profile and telemetry. Values are not real hardware specifications.
+    /// <summary>
+    /// 保存设备配置和实时状态的模拟快照，数据不代表真实硬件规格。
+    /// </summary>
     public sealed record DeviceStatusSnapshot
     {
         public string ControllerModel { get; init; } = "MOCK-MC3";

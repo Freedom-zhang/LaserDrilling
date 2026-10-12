@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:views="clr-namespace:LaserDrilling.Hmi.Views"
+    xmlns:controls="clr-namespace:LaserDrilling.Hmi.Controls"
     Margin="16">
     <Grid.Resources>
         <Style x:Key="RecipeItem" TargetType="ListBoxItem">
@@ -317,7 +318,7 @@
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="175" />
                             </Grid.ColumnDefinitions>
-                            <views:PowerCurveEditor
+                            <controls:PowerCurveEditor
                                 Height="220"
                                 Margin="0,0,12,0"
                                 Revision="{Binding Revision}" />

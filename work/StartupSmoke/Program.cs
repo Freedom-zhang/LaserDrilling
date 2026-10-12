@@ -8,11 +8,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LaserDrilling.Hmi;
 using LaserDrilling.Hmi.Views;
+using LaserDrilling.Hmi.Controls;
+using LaserDrilling.Hmi.Components;
+using LaserDrilling.Hmi.Navigation;
 using LaserDrilling.Hmi.ViewModels;
 using LaserDrilling.Hmi.Services;
 using LaserDrilling.Hmi.Models;
 using Prism.Ioc;
 
+/// <summary>
+/// 执行启动、登录及主要界面交互的自动化冒烟和回归检查。
+/// </summary>
 internal static class Program
 {
     static System.Windows.Controls.Button FindButtonByTag(DependencyObject root, string tag)
@@ -101,7 +107,7 @@ internal static class Program
                 drilling.ConfirmCommand.Execute();
                 for (int step = 0; step < 20; step++) machine.Advance();
                 Require(machine.Homed && machine.CanStart, "Homing enables cycle start");
-                // A changing hint must not move or resize the wheel underneath a held pointer.
+                // 提示文字变化时，按住鼠标下方的轮盘位置和尺寸必须保持不变。
                 foreach (var english in new[] { false, true })
                 {
                     App.Appearance.SetLanguage(english);
@@ -419,6 +425,9 @@ internal static class Program
         }));
         Environment.ExitCode = app.Run();
     }
+    /// <summary>
+    /// 为界面测试提供隔离的账户存储和服务注册环境。
+    /// </summary>
     private sealed class TestApp : App
     {
         public string StorePath { get; } = Path.Combine(Path.GetTempPath(), "LaserDrillingSmoke", Guid.NewGuid().ToString("N"), "accounts.json");

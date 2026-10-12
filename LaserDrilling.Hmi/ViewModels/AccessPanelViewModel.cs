@@ -8,6 +8,9 @@ using Prism.Mvvm;
 
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 管理用户创建及受权限限制的参数配置，并提供校验和操作反馈。
+    /// </summary>
     public sealed class AccessPanelViewModel : BindableBase
     {
         private readonly IAccountService _accounts;

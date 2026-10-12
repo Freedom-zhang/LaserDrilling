@@ -3,6 +3,9 @@ using System.Windows.Controls;
 using LaserDrilling.Hmi.ViewModels;
 namespace LaserDrilling.Hmi.Views
 {
+    /// <summary>
+    /// 显示用户管理和权限相关配置，将密码输入等界面事件转交视图模型。
+    /// </summary>
     public partial class AccessPanel : UserControl
     {
         public AccessPanel() => InitializeComponent();

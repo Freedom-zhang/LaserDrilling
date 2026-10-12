@@ -7,6 +7,9 @@ using Prism.Mvvm;
 
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 协调加工命令、操作确认、孔位编辑和加工设定，调用设备模拟服务。
+    /// </summary>
     public sealed class DrillingViewModel : BindableBase, IDisposable
     {
         public MockDrillingMachine Machine { get; }

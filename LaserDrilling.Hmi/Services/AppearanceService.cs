@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
@@ -6,7 +6,9 @@ using Prism.Mvvm;
 
 namespace LaserDrilling.Hmi.Services
 {
-    // Shared application resources: new pages can reuse the same text and color keys.
+    /// <summary>
+    /// 管理应用语言和主题资源，同步第三方控件库的外观设置。
+    /// </summary>
     public sealed class AppearanceService : BindableBase
     {
         public bool IsEnglish { get; private set; }
@@ -86,7 +88,7 @@ namespace LaserDrilling.Hmi.Services
         public void SetTheme(bool dark)
         {
             IsDark = dark;
-            // Replace only the HandyControl skin, retaining the app's own resource precedence.
+            // 仅替换 HandyControl 皮肤，保留应用自定义资源的优先级。
             var dictionaries = Application.Current.Resources.MergedDictionaries;
             for (var i = 0; i < dictionaries.Count; i++)
             {

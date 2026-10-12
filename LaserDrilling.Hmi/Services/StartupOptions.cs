@@ -4,6 +4,9 @@ using System.Text.Json;
 
 namespace LaserDrilling.Hmi.Services
 {
+    /// <summary>
+    /// 读取启动配置并提供启动页展示时间等选项。
+    /// </summary>
     public sealed class StartupOptions
     {
         public string CompanyName { get; set; } = "XX激光";

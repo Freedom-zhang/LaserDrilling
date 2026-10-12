@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace LaserDrilling.Hmi.Services
 {
+    /// <summary>
+    /// 累计模拟设备使用时间，管理保养登记及本地记录的持久化。
+    /// </summary>
     public sealed class MaintenanceService
     {
         private readonly IAccountService _accounts;

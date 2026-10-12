@@ -5,9 +5,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using LaserDrilling.Hmi.ViewModels;
 
-namespace LaserDrilling.Hmi.Views
+namespace LaserDrilling.Hmi.Controls
 {
-    // Rendering and hit-testing only; processing state remains in the mock service.
+    /// <summary>
+    /// 绘制孔位、加工路径及当前位置，处理缩放和选孔；加工状态由模拟服务维护。
+    /// </summary>
     public sealed class DrillingViewport : FrameworkElement
     {
         public static readonly DependencyProperty RevisionProperty = DependencyProperty.Register(nameof(Revision), typeof(int), typeof(DrillingViewport), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender));

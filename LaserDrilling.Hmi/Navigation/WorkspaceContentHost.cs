@@ -1,11 +1,14 @@
+using LaserDrilling.Hmi.Views;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using LaserDrilling.Hmi.ViewModels;
 
-namespace LaserDrilling.Hmi.Views
+namespace LaserDrilling.Hmi.Navigation
 {
-    // Cache views for one login session; their state belongs to the shared view models.
+    /// <summary>
+    /// 切换并缓存当前登录会话的工作页面，为各页面分配共享视图模型。
+    /// </summary>
     public sealed class WorkspaceContentHost : ContentControl
     {
         private readonly Dictionary<string, FrameworkElement> _pages = new();

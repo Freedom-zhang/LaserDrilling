@@ -1,6 +1,8 @@
 namespace LaserDrilling.Hmi.Models
 {
-    // One cycle processes the complete hole list. Dry-run counters are preview-only.
+    /// <summary>
+    /// 保存本次运行的目标次数和完成次数；一轮覆盖全部孔位，空走单独标记。
+    /// </summary>
     public sealed record ProcessingCycles
     {
         public int Target { get; init; } = 1;

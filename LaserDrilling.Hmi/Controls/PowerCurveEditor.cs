@@ -5,9 +5,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using LaserDrilling.Hmi.ViewModels;
 
-namespace LaserDrilling.Hmi.Views
+namespace LaserDrilling.Hmi.Controls
 {
-    // Rendering and pointer input only. Data and interpolation live in Models/ProcessRecipe.
+    /// <summary>
+    /// 绘制功率曲线并处理节点拖动，曲线数据及插值规则由工艺模型维护。
+    /// </summary>
     public sealed class PowerCurveEditor : FrameworkElement
     {
         public static readonly DependencyProperty RevisionProperty = DependencyProperty.Register(nameof(Revision), typeof(int), typeof(PowerCurveEditor), new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender));

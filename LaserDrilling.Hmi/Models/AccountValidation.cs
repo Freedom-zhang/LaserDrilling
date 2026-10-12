@@ -2,6 +2,9 @@ using System.Text.RegularExpressions;
 
 namespace LaserDrilling.Hmi.Models
 {
+    /// <summary>
+    /// 集中校验用户账户信息，供界面与账户服务复用。
+    /// </summary>
     public static class AccountValidation
     {
         public static string Validate(string name, string password)

@@ -8,6 +8,9 @@ using System.Text.Json;
 
 namespace LaserDrilling.Hmi.Services
 {
+    /// <summary>
+    /// 定义工艺文件读取、保存及当前工艺选择的服务契约。
+    /// </summary>
     public interface IRecipeFileService
     {
         string DirectoryPath { get; }
@@ -18,6 +21,9 @@ namespace LaserDrilling.Hmi.Services
         void Apply(string name);
     }
 
+    /// <summary>
+    /// 管理本地工艺文件的初始化、加载、保存和当前加工工艺快照。
+    /// </summary>
     public sealed class RecipeFileService : IRecipeFileService
     {
         private readonly Func<UserIdentity> _user;
@@ -43,7 +49,7 @@ namespace LaserDrilling.Hmi.Services
         {
             Directory.CreateDirectory(DirectoryPath);
             if (Directory.EnumerateFiles(DirectoryPath, "*.json").Any()) return;
-            // Migrate old embedded recipes once. Never overwrite an existing user file.
+            // 一次性迁移旧版内嵌工艺，避免覆盖已有用户文件。
             var marker = Path.Combine(DirectoryPath, ".initialized");
             if (!File.Exists(marker) && _legacyRecipes.Length > 0)
                 foreach (var recipe in _legacyRecipes) { var migrated = Legacy(recipe); migrated.Validate(); WriteAtomic(PathFor(migrated.Name), migrated); }
@@ -100,7 +106,7 @@ namespace LaserDrilling.Hmi.Services
             lock (_gate)
             {
                 Authorize(true); recipe.Validate(); EnsureFiles();
-                // Locate by embedded name so externally renamed JSON files do not produce duplicates.
+                // 按文件内的工艺名称查找，避免外部重命名 JSON 文件后生成重复工艺。
                 var path = Directory.EnumerateFiles(DirectoryPath, "*.json").FirstOrDefault(p =>
                 {
                     try { return string.Equals(JsonSerializer.Deserialize<ProcessRecipe>(File.ReadAllText(p))?.Name, recipe.Name, StringComparison.OrdinalIgnoreCase); }

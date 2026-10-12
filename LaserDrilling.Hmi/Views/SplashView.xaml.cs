@@ -5,12 +5,15 @@ using LaserDrilling.Hmi.ViewModels;
 
 namespace LaserDrilling.Hmi.Views
 {
+    /// <summary>
+    /// 显示公司启动信息，在首次界面布局完成后启动展示计时。
+    /// </summary>
     public partial class SplashView : UserControl
     {
         public SplashView() => InitializeComponent();
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Start the display interval after the initial layout/render work has run.
+            // 首次布局和渲染完成后，再开始计算启动页展示时间。
             await Dispatcher.Yield(DispatcherPriority.ContextIdle);
             if (IsLoaded && DataContext is SplashViewModel vm) await vm.StartAsync();
         }

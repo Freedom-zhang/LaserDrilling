@@ -4,6 +4,9 @@ using LaserDrilling.Hmi.ViewModels;
 
 namespace LaserDrilling.Hmi.Views
 {
+    /// <summary>
+    /// 显示登录页面，处理密码输入及登录窗口的界面交互。
+    /// </summary>
     public partial class LoginView : UserControl
     {
         public LoginView() => InitializeComponent();

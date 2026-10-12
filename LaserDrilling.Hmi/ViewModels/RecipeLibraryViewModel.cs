@@ -8,6 +8,9 @@ using Prism.Commands;
 using Prism.Mvvm;
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 管理工艺文件及曲线的编辑草稿、校验提示、保存和应用操作。
+    /// </summary>
     public sealed class RecipeLibraryViewModel : BindableBase, IDisposable
     {
         private readonly IAccountService _accounts;

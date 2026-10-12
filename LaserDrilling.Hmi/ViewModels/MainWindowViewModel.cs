@@ -1,7 +1,10 @@
-﻿using Prism.Mvvm;
+using Prism.Mvvm;
 
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 提供主窗口标题等供窗口绑定的基础属性。
+    /// </summary>
     public class MainWindowViewModel : BindableBase
     {
         private string _title = "Prism Application";

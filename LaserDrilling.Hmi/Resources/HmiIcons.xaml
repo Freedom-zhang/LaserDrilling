@@ -1,5 +1,5 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
- <!-- Original 24-unit line icons, reusable and resolution independent. -->
+ <!-- 原创线性图标，使用 24 单位坐标，可复用并支持无损缩放。 -->
  <Geometry x:Key="Icon.Device">M3,3 H21 V17 H3 Z M8,21 H16 M12,17 V21 M6,11 H9 L11,7 L14,14 L16,10 H19</Geometry>
  <Geometry x:Key="Icon.Workspace">M3,3 H9 M3,3 V9 M15,3 H21 V9 M3,15 V21 H9 M15,21 H21 V15 M12,6 V18 M6,12 H18 M9,9 H15 V15 H9 Z</Geometry>
  <Geometry x:Key="Icon.Recipe">M5,3 H19 V21 H5 Z M8,8 H16 M8,12 H16 M8,16 H12 M3,6 H5 M3,11 H5 M3,16 H5</Geometry>

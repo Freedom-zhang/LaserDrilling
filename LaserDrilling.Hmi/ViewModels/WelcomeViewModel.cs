@@ -1,4 +1,5 @@
 using LaserDrilling.Hmi.Services;
+using LaserDrilling.Hmi.Navigation;
 using LaserDrilling.Hmi.Views;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -6,6 +7,9 @@ using Prism.Regions;
 
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 协调主页导航、登录会话、子窗口和各功能视图模型。
+    /// </summary>
     public sealed class WelcomeViewModel : BindableBase, INavigationAware, IRegionMemberLifetime
     {
         private string _selectedPage = "Workspace";

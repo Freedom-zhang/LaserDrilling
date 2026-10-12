@@ -4,12 +4,16 @@ using System.Threading.Tasks;
 
 namespace LaserDrilling.Hmi.Services
 {
-    // Historical teaching example only. No longer registered or used by the application.
-    // Active authentication and authorization live in IAccountService / LocalAccountService.
+    /// <summary>
+    /// 保留历史教学用认证接口；实际认证使用账户服务。
+    /// </summary>
     public interface IDemoAuthenticationService
     {
         Task<bool> SignInAsync(string userName, string password, CancellationToken cancellationToken);
     }
+    /// <summary>
+    /// 保留历史教学用模拟认证实现，当前应用未注册或使用此服务。
+    /// </summary>
     public sealed class DemoAuthenticationService : IDemoAuthenticationService
     {
         public async Task<bool> SignInAsync(string userName, string password, CancellationToken cancellationToken)

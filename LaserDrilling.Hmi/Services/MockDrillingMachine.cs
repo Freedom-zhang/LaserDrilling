@@ -5,7 +5,9 @@ using Prism.Mvvm;
 
 namespace LaserDrilling.Hmi.Services
 {
-    // Deterministic mock only. No laser, motion-card or PLC communication.
+    /// <summary>
+    /// 模拟设备状态、运动和加工过程，不连接激光器、运动控制卡或 PLC。
+    /// </summary>
     public sealed class MockDrillingMachine : BindableBase, IDisposable
     {
         private readonly IAccountService _accounts;

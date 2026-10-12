@@ -3,7 +3,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:hc="https://handyorg.github.io/handycontrol"
-    xmlns:views="clr-namespace:LaserDrilling.Hmi.Views">
+    xmlns:views="clr-namespace:LaserDrilling.Hmi.Views"
+    xmlns:components="clr-namespace:LaserDrilling.Hmi.Components"
+    xmlns:controls="clr-namespace:LaserDrilling.Hmi.Controls">
     <UserControl.Resources>
         <Style TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="{DynamicResource SubtleBrush}" />
@@ -224,7 +226,7 @@
                             Text="{DynamicResource Text.Machine.Workspace}" />
                     </DockPanel>
                 </Border>
-                <views:DrillingViewport
+                <controls:DrillingViewport
                     x:Name="Viewport"
                     Grid.Row="1"
                     Revision="{Binding Machine.Revision}" />
@@ -238,7 +240,7 @@
                         Text="{DynamicResource Text.Machine.ViewportHint}" />
                 </Border>
             </Grid>
-            <views:ProcessPanel Grid.Column="2" />
+            <components:ProcessPanel Grid.Column="2" />
         </Grid>
     </Grid>
 </UserControl>

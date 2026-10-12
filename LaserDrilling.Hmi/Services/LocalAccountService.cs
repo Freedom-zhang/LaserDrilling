@@ -10,8 +10,17 @@ using System.Threading.Tasks;
 
 namespace LaserDrilling.Hmi.Services
 {
+    /// <summary>
+    /// 定义操作员和管理员角色，供功能授权判断使用。
+    /// </summary>
     public enum UserRole { Operator, Administrator }
+    /// <summary>
+    /// 保存当前登录用户的名称和角色。
+    /// </summary>
     public sealed record UserIdentity(string UserName, UserRole Role);
+    /// <summary>
+    /// 定义账户认证、用户管理和工艺配置的服务契约。
+    /// </summary>
     public interface IAccountService
     {
         IRecipeFileService RecipeLibrary { get; }
@@ -30,6 +39,9 @@ namespace LaserDrilling.Hmi.Services
         void SignOut();
     }
 
+    /// <summary>
+    /// 管理本地账户存储、密码验证、登录身份及受权限限制的配置操作。
+    /// </summary>
     public sealed class LocalAccountService : IAccountService
     {
         private const int Iterations = 210000;
@@ -135,7 +147,7 @@ namespace LaserDrilling.Hmi.Services
         private AccountStore Read()
         {
             if (!File.Exists(_path)) return new AccountStore();
-            // Fail closed: a damaged store must never silently reopen administrator setup.
+            // 账户文件损坏时拒绝继续，不能自动重新开放管理员初始化入口。
             var state = JsonSerializer.Deserialize<AccountStore>(File.ReadAllText(_path));
             if (state == null || state.Users == null || state.Users.Count == 0 || state.Parameters == null ||
                 state.Users.Any(u => u == null || string.IsNullOrEmpty(u.Name) || string.IsNullOrEmpty(u.Hash) || string.IsNullOrEmpty(u.Salt) || !Enum.IsDefined(typeof(UserRole), u.Role)))
@@ -153,6 +165,9 @@ namespace LaserDrilling.Hmi.Services
             try { File.WriteAllText(temp, JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true })); File.Move(temp, _path, true); }
             finally { if (File.Exists(temp)) File.Delete(temp); }
         }
+        /// <summary>
+        /// 表示本地账户存储文件的数据结构，包括账户和相关配置。
+        /// </summary>
         public sealed class AccountStore
         {
             public string LastSignedInUserName { get; set; } = "";
@@ -160,6 +175,9 @@ namespace LaserDrilling.Hmi.Services
             public ProcessParameters Parameters { get; set; } = new ProcessParameters(20, 50, 100);
             public List<ProcessRecipe> Recipes { get; set; } = new List<ProcessRecipe>();
         }
+        /// <summary>
+        /// 保存单个账户的角色、密码盐和密码哈希，不保存明文密码。
+        /// </summary>
         public sealed class AccountEntry
         {
             public string Name { get; set; }

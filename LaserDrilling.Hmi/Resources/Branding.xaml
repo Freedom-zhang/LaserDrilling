@@ -1,5 +1,5 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Original placeholder design, not the manufacturer's official trademark. -->
+    <!-- 占位标识。 -->
     <DrawingImage x:Key="CompanyLogo"><DrawingImage.Drawing><DrawingGroup>
         <GeometryDrawing Brush="Transparent" Geometry="M0,0 H128 V128 H0 Z" />
         <GeometryDrawing Brush="#203D52" Geometry="M64,8 L81,43 L70,54 L56,40 Z M120,64 L85,81 L74,70 L88,56 Z M64,120 L47,85 L58,74 L72,88 Z M8,64 L43,47 L54,58 L40,72 Z" />

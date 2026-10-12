@@ -9,6 +9,9 @@ using Prism.Regions;
 
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 管理账户初始化和登录流程、输入校验及登录成功后的页面导航。
+    /// </summary>
     public sealed class LoginViewModel : BindableBase, INavigationAware, IRegionMemberLifetime
     {
         private readonly IAccountService _authentication;
@@ -45,7 +48,7 @@ namespace LaserDrilling.Hmi.ViewModels
         }
         private void OnAppearanceChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         { RaisePropertyChanged(nameof(ErrorMessage)); RaisePropertyChanged(nameof(LoginCaption)); RaisePropertyChanged(nameof(PageTitle)); RaisePropertyChanged(nameof(PageHint)); }
-        // PasswordBox event bridge; never logged or persisted.
+        // 接收密码框事件传递的密码，不写入日志或持久化存储。
         public void UpdatePassword(string password) { _password = password ?? ""; ErrorMessage = ""; }
         public async Task SignInAsync()
         {

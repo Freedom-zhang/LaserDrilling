@@ -1,9 +1,9 @@
-﻿using System.Windows;
+using System.Windows;
 
 namespace LaserDrilling.Hmi.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// 承载应用主导航区域，并切换登录界面和主系统的窗口布局。
     /// </summary>
     public partial class MainWindow : Window
     {

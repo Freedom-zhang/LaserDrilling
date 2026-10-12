@@ -4,8 +4,17 @@ using System.Linq;
 
 namespace LaserDrilling.Hmi.Models
 {
+    /// <summary>
+    /// 表示功率曲线中一个进度与功率百分比节点。
+    /// </summary>
     public sealed record PowerPoint(double Progress, double PowerPercent);
+    /// <summary>
+    /// 保存功率百分比、脉冲频率和脉冲数量等基础加工参数。
+    /// </summary>
     public sealed record ProcessParameters(double PowerPercent, double FrequencyKhz, int PulseCount);
+    /// <summary>
+    /// 描述工艺文件及功率曲线，提供参数校验、快照和曲线插值。
+    /// </summary>
     public sealed record ProcessRecipe(string Name, ProcessParameters Parameters)
     {
         public static IReadOnlyList<string> AvailableGases { get; } = Array.AsReadOnly(new[] { "N2", "O2", "AIR", "Ar" });

@@ -8,6 +8,9 @@ using Prism.Regions;
 
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 管理启动页展示时间，并在展示结束后导航至登录页。
+    /// </summary>
     public sealed class SplashViewModel : BindableBase, INavigationAware, IRegionMemberLifetime
     {
         private readonly IRegionManager _regions;

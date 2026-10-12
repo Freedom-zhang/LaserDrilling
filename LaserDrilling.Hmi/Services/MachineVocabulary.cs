@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 namespace LaserDrilling.Hmi.Services
 {
+    /// <summary>
+    /// 提供设备操作、状态和提示信息的中英文词条。
+    /// </summary>
     public static class MachineVocabulary
     {
         public static Dictionary<string, string[]> All { get; } = new Dictionary<string, string[]>

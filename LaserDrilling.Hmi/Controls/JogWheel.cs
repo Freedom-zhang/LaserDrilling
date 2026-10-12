@@ -5,8 +5,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using LaserDrilling.Hmi.ViewModels;
 
-namespace LaserDrilling.Hmi.Views
+namespace LaserDrilling.Hmi.Controls
 {
+    /// <summary>
+    /// 绘制 XY 点动轮盘，处理方向输入及鼠标释放时的点动停止。
+    /// </summary>
     public sealed class JogWheel : FrameworkElement
     {
         private Window _owner;

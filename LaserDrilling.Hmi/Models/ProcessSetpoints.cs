@@ -1,6 +1,9 @@
 using Prism.Mvvm;
 namespace LaserDrilling.Hmi.Models
 {
+    /// <summary>
+    /// 保存加工设定的编辑草稿，供界面绑定并在应用时转换为加工参数。
+    /// </summary>
     public sealed class ProcessSetpoints : BindableBase
     {
         private double _power, _frequency;

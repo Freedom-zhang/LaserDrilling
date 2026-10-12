@@ -1,6 +1,8 @@
 namespace LaserDrilling.Hmi.Models
 {
-    // Demonstration timing and travel limits; independent of presentation and real hardware.
+    /// <summary>
+    /// 定义模拟运行的时序、行程和运动参数，与界面及真实硬件实现分离。
+    /// </summary>
     public sealed record SimulationParameters
     {
         public double ZMinimum { get; init; } = -50;

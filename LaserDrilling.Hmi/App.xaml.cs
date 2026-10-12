@@ -8,7 +8,7 @@ using LaserDrilling.Hmi.ViewModels;
 namespace LaserDrilling.Hmi
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// 应用程序入口，配置 Prism 容器、页面导航及全局服务。
     /// </summary>
     public partial class App
     {

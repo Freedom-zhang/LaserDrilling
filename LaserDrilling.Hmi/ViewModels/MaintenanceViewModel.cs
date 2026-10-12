@@ -8,6 +8,9 @@ using Prism.Mvvm;
 
 namespace LaserDrilling.Hmi.ViewModels
 {
+    /// <summary>
+    /// 提供设备使用计时和保养记录的界面数据，管理保养登记命令。
+    /// </summary>
     public sealed class MaintenanceViewModel : BindableBase, IDisposable
     {
         private readonly MockDrillingMachine _machine;

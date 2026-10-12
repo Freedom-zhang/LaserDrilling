@@ -5,6 +5,8 @@
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:views="clr-namespace:LaserDrilling.Hmi.Views"
+    xmlns:navigation="clr-namespace:LaserDrilling.Hmi.Navigation"
+    xmlns:components="clr-namespace:LaserDrilling.Hmi.Components"
     prism:ViewModelLocator.AutoWireViewModel="True"
     Loaded="OnLoaded"
     UseLayoutRounding="True"
@@ -190,7 +192,7 @@
                 </StackPanel>
             </DockPanel>
         </Border>
-        <!-- One continuous background prevents fractional-DPI seams at the console junction. -->
+        <!-- 使用连续背景，避免非整数 DPI 缩放时控制区连接处出现细缝。 -->
         <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
                 Background="{DynamicResource ConsoleBackgroundBrush}" BorderThickness="0" />
         <Grid Grid.Row="1" Grid.Column="1" Background="{DynamicResource PageBrush}">
@@ -198,9 +200,9 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="72" />
             </Grid.RowDefinitions>
-            <views:WorkspaceContentHost SelectedPage="{Binding SelectedPage}">
-                <views:WorkspaceContentHost.Style>
-                    <Style TargetType="views:WorkspaceContentHost">
+            <navigation:WorkspaceContentHost SelectedPage="{Binding SelectedPage}">
+                <navigation:WorkspaceContentHost.Style>
+                    <Style TargetType="navigation:WorkspaceContentHost">
                         <Setter Property="Margin" Value="0" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding SelectedPage}" Value="Workspace">
@@ -208,8 +210,8 @@
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </views:WorkspaceContentHost.Style>
-            </views:WorkspaceContentHost>
+                </navigation:WorkspaceContentHost.Style>
+            </navigation:WorkspaceContentHost>
             <Border
                 Grid.Row="1"
                 Padding="8,6"
@@ -330,7 +332,7 @@
                 </Grid>
             </Border>
         </Grid>
-        <views:ControlConsole
+        <components:ControlConsole
             IsEnabled="{Binding DataContext.IsConsoleEnabled, RelativeSource={RelativeSource AncestorType=views:WelcomeView}}"
             Grid.Row="1"
             Grid.Column="2"
