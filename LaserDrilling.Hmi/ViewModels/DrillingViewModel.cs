@@ -21,6 +21,12 @@ namespace LaserDrilling.Hmi.ViewModels
         public string Confirmation => HasConfirmation ? App.Appearance.Text("Machine.Confirm" + _pending) : "";
         public string Notice => _notice == "" ? "" : App.Appearance.Text(_notice);
         public string PauseCaption => App.Appearance.Text(Machine.State == MachineState.Paused ? "Machine.Resume" : "Machine.Pause");
+        public DelegateCommand ShutterCommand { get; }
+        public DelegateCommand RedLightCommand { get; }
+        public DelegateCommand AirCommand { get; }
+        public DelegateCommand FollowCommand { get; }
+        public DelegateCommand EmitCommand { get; }
+        public DelegateCommand FrameCommand { get; }
         public DelegateCommand HomeCommand { get; }
         public DelegateCommand StartCommand { get; }
         public DelegateCommand DryRunCommand { get; }
@@ -38,15 +44,21 @@ namespace LaserDrilling.Hmi.ViewModels
         public DrillingViewModel(IAccountService accounts)
         {
             Machine = new MockDrillingMachine(accounts);
+            ShutterCommand = new DelegateCommand(Machine.ToggleShutter, () => Machine.CanAuxiliary);
+            RedLightCommand = new DelegateCommand(Machine.ToggleRedLight, () => Machine.CanAuxiliary);
+            AirCommand = new DelegateCommand(Machine.ToggleAir, () => Machine.CanAuxiliary);
+            FollowCommand = new DelegateCommand(Machine.ToggleFollow, () => Machine.CanAuxiliary && Machine.Homed);
+            EmitCommand = new DelegateCommand(() => Ask("Emit"), () => Machine.CanTest);
+            FrameCommand = new DelegateCommand(() => Ask("Frame"), () => Machine.CanStart);
             HomeCommand = new DelegateCommand(() => Ask("Home"), () => Machine.CanHome);
             StartCommand = new DelegateCommand(() => Ask("Start"), () => Machine.CanStart);
             DryRunCommand = new DelegateCommand(() => Ask("DryRun"), () => Machine.CanStart);
             PauseCommand = new DelegateCommand(Machine.PauseResume, () => Machine.State == MachineState.Running || Machine.State == MachineState.Paused);
-            StopCommand = new DelegateCommand(Machine.Stop, () => Machine.Busy || Machine.IsJogging);
+            StopCommand = new DelegateCommand(Machine.Stop, () => Machine.Busy || Machine.IsJogging || Machine.HasOutputs);
             EmergencyCommand = new DelegateCommand(() => { Cancel(); Machine.Emergency(); });
             DoorCommand = new DelegateCommand(() => { Cancel(); Machine.ToggleDoor(); });
             ResetCommand = new DelegateCommand(() => Ask("Reset"), () => Machine.State == MachineState.Fault && Machine.DoorClosed);
-            ConfirmCommand = new DelegateCommand(() => { var action = _pending; Cancel(); if (action == "Home") Machine.Home(); else if (action == "Start") Machine.Start(); else if (action == "DryRun") Machine.StartDryRun(); else if (action == "Reset") Machine.Reset(); });
+            ConfirmCommand = new DelegateCommand(() => { var action = _pending; Cancel(); if (action == "Home") Machine.Home(); else if (action == "Start") Machine.Start(); else if (action == "DryRun") Machine.StartDryRun(); else if (action == "Emit") Machine.TestEmission(); else if (action == "Frame") Machine.Frame(); else if (action == "Reset") Machine.Reset(); });
             CancelCommand = new DelegateCommand(Cancel);
             JogCommand = new DelegateCommand<string>(Machine.Jog, _ => Machine.CanStart);
             AddCommand = new DelegateCommand(() => Edit(null), () => Machine.CanEdit);
@@ -72,6 +84,7 @@ namespace LaserDrilling.Hmi.ViewModels
         }
         private void OnMachineChanged(object sender, PropertyChangedEventArgs e)
         {
+            foreach (var command in new[] { ShutterCommand, RedLightCommand, AirCommand, FollowCommand, EmitCommand, FrameCommand }) command.RaiseCanExecuteChanged();
             DryRunCommand.RaiseCanExecuteChanged();
             HomeCommand.RaiseCanExecuteChanged(); StartCommand.RaiseCanExecuteChanged(); PauseCommand.RaiseCanExecuteChanged(); StopCommand.RaiseCanExecuteChanged(); ResetCommand.RaiseCanExecuteChanged(); JogCommand.RaiseCanExecuteChanged();
             AddCommand.RaiseCanExecuteChanged(); ApplyCommand.RaiseCanExecuteChanged(); DeleteCommand.RaiseCanExecuteChanged(); RaisePropertyChanged(nameof(PauseCaption));

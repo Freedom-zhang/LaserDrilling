@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
@@ -32,6 +32,15 @@ namespace LaserDrilling.Hmi.Views
             Text(dc, "100.000 mm", new Point(ActualWidth/2 - 30, P(0, 80).Y - 24));
             if (DataContext is DrillingViewModel vm)
             {
+                if (vm.Machine.IsFraming)
+                {
+                    var framePen = new Pen(B("#FF725D"), 2) { DashStyle = DashStyles.Dash };
+                    for (int i = 1; i < vm.Machine.FramePath.Count; i++)
+                    {
+                        var previous = vm.Machine.FramePath[i-1]; var next = vm.Machine.FramePath[i];
+                        dc.DrawLine(framePen, P(previous.X, previous.Y), P(next.X, next.Y));
+                    }
+                }
                 var travel = new Pen(B("#4D7589"), 1) { DashStyle = DashStyles.Dash };
                 for (int i = 1; i < vm.Machine.Holes.Count; i++) dc.DrawLine(travel, P(vm.Machine.Holes[i-1].X, vm.Machine.Holes[i-1].Y), P(vm.Machine.Holes[i].X, vm.Machine.Holes[i].Y));
                 foreach (var h in vm.Machine.Holes)
@@ -41,7 +50,8 @@ namespace LaserDrilling.Hmi.Views
                     if (h == vm.Selected) dc.DrawEllipse(null, new Pen(B("#F2BD69"), 1.5), point, radius+5, radius+5);
                     Text(dc, h.Number.ToString("00"), new Point(point.X+7, point.Y-17), "#8DAEBE", 10);
                 }
-                var beam = P(vm.Machine.X, vm.Machine.Y); var pen = new Pen(B(vm.Machine.LaserOn ? "#FFB64D" : "#59C5D0"), 1.5);
+                Text(dc, $"Z {vm.Machine.Z:F3} mm", new Point(16,34), "#D0E3ED");
+                var beam = P(vm.Machine.X, vm.Machine.Y); var pen = new Pen(B(vm.Machine.LaserOn ? "#FFB64D" : vm.Machine.RedLightOn ? "#FF5050" : "#59C5D0"), 1.5);
                 dc.DrawLine(pen, new Point(beam.X-13, beam.Y), new Point(beam.X+13, beam.Y)); dc.DrawLine(pen, new Point(beam.X, beam.Y-13), new Point(beam.X, beam.Y+13));
                 if (vm.Machine.LaserOn) dc.DrawEllipse(B("#FFE2A1"), null, beam, 3, 3);
             }

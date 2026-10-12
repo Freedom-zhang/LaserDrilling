@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Collections.ObjectModel;
 using Prism.Mvvm;
 
@@ -11,19 +12,48 @@ namespace LaserDrilling.Hmi.Services
         private readonly System.Windows.Threading.DispatcherTimer _timer;
         private int _tick, _index, _revision;
         private double _fromX, _fromY;
-        private double _jogX, _jogY;
+        private double _jogX, _jogY, _jogZ;
+        private int _testTicks, _frameIndex;
+        private (double X, double Y)[] _frame = Array.Empty<(double, double)>();
+        public bool ShutterOpen { get; private set; }
+        public bool RedLightOn { get; private set; }
+        public bool FollowEnabled { get; private set; }
+        public bool IsTesting => _testTicks > 0;
+        public bool IsFraming { get; private set; }
+        public System.Collections.Generic.IReadOnlyList<(double X, double Y)> FramePath => _frame;
+        private double _jogOverride = 100;
+        public double JogOverride { get => _jogOverride; set { if (double.IsFinite(value)) { _jogOverride = Math.Clamp(value, 10, 100); Changed(); } } }
+        public bool CanAuxiliary => CanHome && _accounts.CurrentUser != null;
+        public bool CanTest => CanAuxiliary && Homed && ShutterOpen && !RedLightOn;
+        public bool CanZJog => CanJog && !FollowEnabled;
+        public bool HasOutputs => ShutterOpen || RedLightOn || AirOn || LaserOn;
+        public void ToggleShutter() { Authenticate(); if (!CanAuxiliary) return; ShutterOpen = !ShutterOpen; Changed(); }
+        public void ToggleRedLight() { Authenticate(); if (!CanAuxiliary) return; RedLightOn = !RedLightOn; Changed(); }
+        public void ToggleAir() { Authenticate(); if (!CanAuxiliary) return; AirOn = !AirOn; Changed(); }
+        public void ToggleFollow() { Authenticate(); if (!CanAuxiliary || !Homed) return; FollowEnabled = !FollowEnabled; if (FollowEnabled) Z = Math.Clamp(_activeRecipe.FocusOffsetMm, Simulation.ZMinimum, Simulation.ZMaximum); Changed(); }
+        private void OutputsOff() { ShutterOpen = RedLightOn = LaserOn = AirOn = false; _testTicks = 0; IsFraming = false; }
+        public void EndManualTest() { if (!IsTesting) return; OutputsOff(); Changed(); }
+        public void TestEmission() { Authenticate(); if (!CanTest) return; _testTicks = Simulation.TestEmissionTicks; LaserOn = true; AirOn = false; Log("WARN", "Machine.TestEmission"); Changed(); }
+        public void BeginZJog(double direction) { Authenticate(); if (!CanZJog || !double.IsFinite(direction) || direction == 0) return; OutputsOff(); _jogX = _jogY = 0; _jogZ = Math.Sign(direction); IsJogging = true; Changed(); }
+        public void Frame()
+        {
+            Authenticate(); if (!CanStart) return;
+            OutputsOff(); var left = Math.Max(0, Holes.Min(h => h.X-h.Diameter/2)-2); var right = Math.Min(Simulation.TravelXmm, Holes.Max(h => h.X+h.Diameter/2)+2);
+            var bottom = Math.Max(0, Holes.Min(h => h.Y-h.Diameter/2)-2); var top = Math.Min(Simulation.TravelYmm, Holes.Max(h => h.Y+h.Diameter/2)+2);
+            _frame = new[] { (left,bottom), (right,bottom), (right,top), (left,top), (left,bottom) }; _frameIndex = 0; IsFraming = true; RedLightOn = true; Log("INFO", "Machine.Frame"); Changed();
+        }
         public SimulationParameters Simulation { get; } = new SimulationParameters();
         private ProcessRecipe _activeRecipe;
         public string ActiveRecipeName => _activeRecipe?.Name ?? "—";
         public double HoleProgress => Math.Clamp((_tick - Simulation.TravelTicks - 1) * Simulation.TickMilliseconds / (_activeRecipe?.DwellMilliseconds ?? 900) * 100, 0, 100);
-        public double CurrentPowerPercent => LaserOn ? _activeRecipe.PowerAt(HoleProgress) : 0;
+        public double CurrentPowerPercent => LaserOn ? IsTesting ? Simulation.TestPowerPercent : _activeRecipe.PowerAt(HoleProgress) : 0;
         public string ConnectionText => App.Appearance.Text("Machine.MockConnected");
-        public string MotionText => State == MachineState.Fault ? StateText : IsJogging ? App.Appearance.Text("Machine.ManualMoving") : Busy ? StateText : ReferenceText;
+        public string MotionText => IsFraming ? App.Appearance.Text("Machine.Frame") : State == MachineState.Fault ? StateText : IsJogging ? App.Appearance.Text("Machine.ManualMoving") : Busy ? StateText : ReferenceText;
         public bool IsJogging { get; private set; }
         public bool IsDryRun { get; private set; }
         public bool AirOn { get; private set; }
         public bool CanJog => !Busy && Homed && DoorClosed && !EmergencyLatched && State != MachineState.Fault && _accounts.CurrentUser != null;
-        public string ModeText => App.Appearance.Text(IsDryRun ? "Machine.DryMode" : "Machine.CutMode");
+        public string ModeText => App.Appearance.Text(IsTesting ? "Machine.TestEmission" : IsFraming ? "Machine.Frame" : IsDryRun ? "Machine.DryMode" : "Machine.CutMode");
         public string CountLabel => App.Appearance.Text(IsDryRun ? "Machine.VisitedCount" : "Machine.CompletedLabel");
         public string AirText => App.Appearance.Text(AirOn ? "Machine.AirOn" : "Machine.AirOff");
         public ObservableCollection<DrillHole> Holes { get; } = new ObservableCollection<DrillHole>();
@@ -38,14 +68,14 @@ namespace LaserDrilling.Hmi.Services
         public double Z { get; private set; }
         public int Completed { get; private set; }
         public int Revision => _revision;
-        public bool Busy => State == MachineState.Running || State == MachineState.Paused || State == MachineState.Homing;
+        public bool Busy => IsTesting || IsFraming || State == MachineState.Running || State == MachineState.Paused || State == MachineState.Homing;
         public bool CanHome => !Busy && !IsJogging && DoorClosed && !EmergencyLatched && State != MachineState.Fault;
         public bool CanStart => CanHome && Homed && Holes.Count > 0;
         public bool CanEdit => !Busy && !IsJogging && State != MachineState.Fault && _accounts.CurrentUser?.Role == UserRole.Administrator;
         public double Progress => Holes.Count == 0 ? 0 : 100.0 * Completed / Holes.Count;
         public double Elapsed { get; private set; }
         public string StateText => App.Appearance.Text("Machine." + (IsDryRun && State == MachineState.Running ? "DryRunning" : IsDryRun && State == MachineState.Completed ? "DryComplete" : State.ToString()));
-        public string LaserText => App.Appearance.Text(LaserOn ? "Machine.Emitting" : "Machine.Standby");
+        public string LaserText => App.Appearance.Text(State == MachineState.Fault ? "Machine.EmissionInhibited" : LaserOn ? "Machine.Emitting" : "Machine.Standby");
         public string DoorText => App.Appearance.Text(DoorClosed ? "Machine.Closed" : "Machine.Open");
         public string ReferenceText => App.Appearance.Text(Homed ? "Machine.Referenced" : "Machine.NotReferenced");
         public string ProgressText => $"{Completed:00} / {Holes.Count:00}";
@@ -73,14 +103,14 @@ namespace LaserDrilling.Hmi.Services
         public void Home()
         {
             Authenticate(); if (!CanHome) return;
-            State = MachineState.Homing; Homed = false; _tick = 0; LaserOn = false; Log("INFO", "Machine.HomeStarted"); Changed();
+            OutputsOff(); State = MachineState.Homing; Homed = false; _tick = 0; LaserOn = false; Log("INFO", "Machine.HomeStarted"); Changed();
         }
         public void Start() => StartCycle(false);
         public void StartDryRun() => StartCycle(true);
         private void StartCycle(bool dryRun)
         {
             Authenticate(); if (!CanStart) return;
-            IsDryRun = dryRun; LaserOn = false; AirOn = false;
+            OutputsOff(); IsDryRun = dryRun; ShutterOpen = !dryRun;
             RefreshRecipe(); foreach (var hole in Holes) { if (!dryRun) hole.Done = false; hole.Visited = false; }
             Completed = 0; Elapsed = 0; _index = 0; _tick = 0; _fromX = X; _fromY = Y;
             State = MachineState.Running; Log("INFO", dryRun ? "Machine.DryStarted" : "Machine.CycleStarted"); Changed();
@@ -88,13 +118,13 @@ namespace LaserDrilling.Hmi.Services
         public void PauseResume()
         {
             Authenticate();
-            if (State == MachineState.Running) { State = MachineState.Paused; LaserOn = false; AirOn = false; Log("INFO", "Machine.CyclePaused"); }
-            else if (State == MachineState.Paused && DoorClosed && !EmergencyLatched) { State = MachineState.Running; Log("INFO", "Machine.CycleResumed"); }
+            if (State == MachineState.Running) { ShutterOpen = false; State = MachineState.Paused; LaserOn = false; AirOn = false; Log("INFO", "Machine.CyclePaused"); }
+            else if (State == MachineState.Paused && DoorClosed && !EmergencyLatched) { ShutterOpen = !IsDryRun; State = MachineState.Running; Log("INFO", "Machine.CycleResumed"); }
             Changed();
         }
         public void Stop()
         {
-            Authenticate(); EndJog(); if (!Busy) return;
+            Authenticate(); var wasBusy = Busy; EndJog(); OutputsOff(); if (!wasBusy) { Changed(); return; }
             if (State == MachineState.Homing) Homed = false;
             State = MachineState.Stopped; LaserOn = false; AirOn = false; Log("WARN", "Machine.CycleStopped"); Changed();
         }
@@ -109,7 +139,7 @@ namespace LaserDrilling.Hmi.Services
         }
         private void Fault(string key)
         {
-            IsJogging = false; _jogX = _jogY = 0; State = MachineState.Fault; Homed = false; LaserOn = false; AirOn = false; Log("ALARM", key); Changed();
+            OutputsOff(); FollowEnabled = false; IsJogging = false; _jogX = _jogY = _jogZ = 0; State = MachineState.Fault; Homed = false; LaserOn = false; AirOn = false; Log("ALARM", key); Changed();
         }
         public void Reset()
         {
@@ -127,9 +157,9 @@ namespace LaserDrilling.Hmi.Services
             Authenticate();
             if (!CanJog || !double.IsFinite(x) || !double.IsFinite(y) || (x == 0 && y == 0)) return;
             var length = Math.Sqrt(x*x + y*y);
-            _jogX = x / length; _jogY = y / length; IsJogging = true; LaserOn = false; AirOn = false; Changed();
+            OutputsOff(); _jogZ = 0; _jogX = x / length; _jogY = y / length; IsJogging = true; LaserOn = false; AirOn = false; Changed();
         }
-        public void EndJog() { IsJogging = false; _jogX = _jogY = 0; Changed(); }
+        public void EndJog() { IsJogging = false; _jogX = _jogY = _jogZ = 0; Changed(); }
         public void EditHole(DrillHole selected, double x, double y, double diameter, double depth)
         {
             if (!CanEdit) throw new UnauthorizedAccessException();
@@ -150,11 +180,20 @@ namespace LaserDrilling.Hmi.Services
         private void OnTick(object sender, EventArgs e) => Advance();
         public void Advance()
         {
-            if (_accounts.CurrentUser == null) { IsJogging = false; LaserOn = false; AirOn = false; if (Busy) State = MachineState.Stopped; Changed(); return; }
+            if (_accounts.CurrentUser == null) { OutputsOff(); IsJogging = false; LaserOn = false; AirOn = false; if (Busy) State = MachineState.Stopped; Changed(); return; }
+            if (IsTesting) { if (--_testTicks == 0) OutputsOff(); Changed(); return; }
+            if (IsFraming)
+            {
+                var target = _frame[_frameIndex]; var dx = target.X-X; var dy = target.Y-Y; var distance = Math.Sqrt(dx*dx+dy*dy); var step = Simulation.FrameSpeed*Simulation.TickMilliseconds/1000;
+                if (distance <= step) { X = target.X; Y = target.Y; if (++_frameIndex == _frame.Length) { OutputsOff(); Log("INFO", "Machine.FrameDone"); } }
+                else { X += dx/distance*step; Y += dy/distance*step; }
+                Changed(); return;
+            }
             if (IsJogging)
             {
                 if (!CanJog) { EndJog(); return; }
-                X = Math.Clamp(X + _jogX * Simulation.JogSpeedMmPerSecond * Simulation.TickMilliseconds / 1000, 0, Simulation.TravelXmm); Y = Math.Clamp(Y + _jogY * Simulation.JogSpeedMmPerSecond * Simulation.TickMilliseconds / 1000, 0, Simulation.TravelYmm);
+                X = Math.Clamp(X + _jogX * Simulation.JogSpeedMmPerSecond * JogOverride / 100 * Simulation.TickMilliseconds / 1000, 0, Simulation.TravelXmm); Y = Math.Clamp(Y + _jogY * Simulation.JogSpeedMmPerSecond * JogOverride / 100 * Simulation.TickMilliseconds / 1000, 0, Simulation.TravelYmm);
+                Z = Math.Clamp(Z + _jogZ * Simulation.JogSpeedMmPerSecond * JogOverride / 100 * Simulation.TickMilliseconds / 1000, Simulation.ZMinimum, Simulation.ZMaximum);
                 Changed(); return;
             }
             if (State == MachineState.Homing)
@@ -166,12 +205,12 @@ namespace LaserDrilling.Hmi.Services
             Elapsed += Simulation.TickMilliseconds / 1000.0; _tick++;
             var h = Holes[_index]; var fraction = Math.Min(1, (double)_tick / Simulation.TravelTicks);
             X = _fromX + (h.X - _fromX) * fraction; Y = _fromY + (h.Y - _fromY) * fraction;
-            LaserOn = !IsDryRun && _tick > Simulation.TravelTicks; AirOn = !IsDryRun && _tick > Simulation.TravelTicks; Z = 0;
+            LaserOn = ShutterOpen && !IsDryRun && _tick > Simulation.TravelTicks; AirOn = !IsDryRun && _tick > Simulation.TravelTicks; if (FollowEnabled) Z = Math.Clamp(_activeRecipe.FocusOffsetMm, Simulation.ZMinimum, Simulation.ZMaximum);
             if (_tick >= Simulation.TravelTicks + 1 + Math.Ceiling(_activeRecipe.DwellMilliseconds / Simulation.TickMilliseconds))
             {
                 if (IsDryRun) h.Visited = true; else h.Done = true;
                 Completed++; LaserOn = false; AirOn = false; _tick = 0; _fromX = X; _fromY = Y; _index++;
-                if (_index >= Holes.Count) { State = MachineState.Completed; Log("INFO", IsDryRun ? "Machine.DryDone" : "Machine.CycleDone"); }
+                if (_index >= Holes.Count) { ShutterOpen = false; State = MachineState.Completed; Log("INFO", IsDryRun ? "Machine.DryDone" : "Machine.CycleDone"); }
             }
             Changed();
         }
@@ -181,6 +220,6 @@ namespace LaserDrilling.Hmi.Services
             if (Events.Count > 200) Events.RemoveAt(Events.Count - 1);
         }
         public void Changed() { _revision++; RaisePropertyChanged(""); }
-        public void Dispose() { _timer.Stop(); _timer.Tick -= OnTick; IsJogging = false; LaserOn = false; AirOn = false; }
+        public void Dispose() { OutputsOff(); _timer.Stop(); _timer.Tick -= OnTick; IsJogging = false; LaserOn = false; AirOn = false; }
     }
 }

@@ -1,10 +1,22 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 namespace LaserDrilling.Hmi.Services
 {
     public static class MachineVocabulary
     {
         public static Dictionary<string, string[]> All { get; } = new Dictionary<string, string[]>
         {
+            ["Shutter"] = new[] { "光闸", "Shutter" },
+["RedLight"] = new[] { "红光", "Red light" },
+["Emit"] = new[] { "出光测试", "Test beam" },
+["Follow"] = new[] { "跟随 / 模拟", "Follow / mock" },
+["Frame"] = new[] { "走边框", "Trace frame" },
+["FrameDone"] = new[] { "走边框完成", "Frame trace complete" },
+["TestEmission"] = new[] { "限时模拟出光", "Timed mock emission" },
+["Speed"] = new[] { "点动速度倍率", "Jog speed override" },
+["ConsoleHint"] = new[] { "点动前先回零 · Z 跟随开启时禁止手动 Z", "Home before jogging · Z locked during follow" },
+["ConfirmEmit"] = new[] { "模拟出光测试：5% 功率，持续 0.5 秒后自动关光。停止或门联锁可立即中断。", "Mock beam test: 5% power for 0.5 seconds. Stop or door interlock aborts immediately." },
+["ConfirmFrame"] = new[] { "沿孔位外接矩形走边框，仅红光指示，不出光、不吹气，不改变加工完成数量。", "Trace the hole bounding rectangle with red aiming light only. No laser or air; completion counts remain unchanged." },
+            ["EmissionInhibited"] = new[] { "联锁锁定 / 禁止出光", "Interlock / Emission inhibited" },
             ["LivePower"] = new[] { "模拟功率", "Mock power" },
             ["ConnectionStatus"] = new[] { "设备连接状态", "Device connection" },
             ["LaserStatus"] = new[] { "激光器状态", "Laser status" },

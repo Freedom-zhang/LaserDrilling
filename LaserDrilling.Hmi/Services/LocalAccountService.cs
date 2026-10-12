@@ -106,8 +106,8 @@ namespace LaserDrilling.Hmi.Services
         private static AccountEntry CreateEntry(string name, string password, UserRole role)
         {
             name = name?.Trim();
-            if (name == null || !Regex.IsMatch(name, "^[a-zA-Z0-9_.-]{3,32}$")) throw new ArgumentException("InvalidUserName");
-            if (password == null || password.Length < 8 || password.Length > 128) throw new ArgumentException("InvalidPassword");
+            var validationError = AccountValidation.Validate(name, password);
+            if (validationError != null) throw new ArgumentException(validationError);
             if (!Enum.IsDefined(typeof(UserRole), role)) throw new ArgumentException("AccessDenied");
             var salt = RandomNumberGenerator.GetBytes(16);
             return new AccountEntry { Name = name, Role = role, Salt = Convert.ToBase64String(salt), Hash = Convert.ToBase64String(Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, 32)) };

@@ -1,4 +1,4 @@
-﻿using LaserDrilling.Hmi.Services;
+using LaserDrilling.Hmi.Services;
 using LaserDrilling.Hmi.Views;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -8,6 +8,10 @@ namespace LaserDrilling.Hmi.ViewModels
 {
     public sealed class WelcomeViewModel : BindableBase, INavigationAware, IRegionMemberLifetime
     {
+        private string _selectedPage = "Workspace";
+        public string SelectedPage { get => _selectedPage; private set => SetProperty(ref _selectedPage, value); }
+        public RecipeLibraryViewModel Recipes { get; private set; }
+        private void SelectPage(string page) { Operation?.Machine.EndJog(); if (page == "Recipes" && Recipes?.ReloadCommand.CanExecute() == true) Recipes.ReloadCommand.Execute(); SelectedPage = page; }
         private string _userName = "";
         private readonly System.Windows.Threading.DispatcherTimer _clock = new() { Interval = System.TimeSpan.FromSeconds(1) };
         public string ClockText => System.DateTime.Now.ToString("yyyy-MM-dd  HH:mm:ss");
@@ -36,10 +40,10 @@ namespace LaserDrilling.Hmi.ViewModels
             _accounts = accounts;
             _regions = regions;
             SignOutCommand = new DelegateCommand(() => { _windows.CloseAll(); accounts.SignOut(); regions.RequestNavigate("ContentRegion", nameof(LoginView)); }, () => Operation?.Machine.Busy != true && Operation?.Machine.IsJogging != true);
-            OperationCommand = new DelegateCommand(() => { System.Windows.Application.Current.MainWindow.Activate(); Operation?.Machine.RefreshRecipe(); });
-            DeviceCommand = new DelegateCommand(() => _windows.Open("Device", this));
-            LogsCommand = new DelegateCommand(() => _windows.Open("Logs", this));
-            RecipeCommand = new DelegateCommand(() => _windows.Open("Recipes", this, new RecipeLibraryViewModel(_accounts, Operation.Machine)));
+            OperationCommand = new DelegateCommand(() => { SelectPage("Workspace"); Operation?.Machine.RefreshRecipe(); });
+            DeviceCommand = new DelegateCommand(() => SelectPage("Device"));
+            LogsCommand = new DelegateCommand(() => SelectPage("Logs"));
+            RecipeCommand = new DelegateCommand(() => SelectPage("Recipes"));
             SettingsCommand = new DelegateCommand(() => _windows.Open("Settings", this), () => Operation?.Machine.Busy != true && Operation?.Machine.IsJogging != true);
             LanguageCommand = new DelegateCommand(() => { App.Appearance.SetLanguage(!App.Appearance.IsEnglish); Panel?.RefreshLanguage(); Operation?.Machine.Changed(); });
             ThemeCommand = new DelegateCommand(() => App.Appearance.SetTheme(!App.Appearance.IsDark));
@@ -51,10 +55,11 @@ namespace LaserDrilling.Hmi.ViewModels
             UserName = _accounts.CurrentUser.UserName;
             Panel = new AccessPanelViewModel(_accounts);
             Operation = new DrillingViewModel(_accounts);
+            Recipes = new RecipeLibraryViewModel(_accounts, Operation.Machine);
             Operation.Machine.PropertyChanged += OnMachineChanged;
         }
         public bool IsNavigationTarget(NavigationContext context) => false;
         private void OnMachineChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) { SignOutCommand.RaiseCanExecuteChanged(); SettingsCommand.RaiseCanExecuteChanged(); }
-        public void OnNavigatedFrom(NavigationContext context) { _clock.Stop(); _clock.Tick -= ClockTick; _windows.CloseAll(); Panel?.Clear(); if (Operation != null) { Operation.Machine.PropertyChanged -= OnMachineChanged; Operation.Dispose(); } }
+        public void OnNavigatedFrom(NavigationContext context) { _clock.Stop(); _clock.Tick -= ClockTick; _windows.CloseAll(); Recipes?.Dispose(); Panel?.Clear(); if (Operation != null) { Operation.Machine.PropertyChanged -= OnMachineChanged; Operation.Dispose(); } }
     }
 }

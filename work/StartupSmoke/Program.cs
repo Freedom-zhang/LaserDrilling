@@ -15,6 +15,12 @@ using Prism.Ioc;
 
 internal static class Program
 {
+    static System.Windows.Controls.Button FindButtonByTag(DependencyObject root, string tag)
+    {
+        if(root is System.Windows.Controls.Button button && button.Tag?.ToString()==tag)return button;
+        for(int i=0;i<VisualTreeHelper.GetChildrenCount(root);i++) { var found=FindButtonByTag(VisualTreeHelper.GetChild(root,i),tag); if(found!=null)return found; }
+        return null;
+    }
     [STAThread]
     static void Main()
     {
@@ -51,10 +57,24 @@ internal static class Program
                 await Task.Delay(100);
                 var adminWelcome = (WelcomeViewModel)Find<WelcomeView>(window).DataContext;
                 Require(adminWelcome.Panel.CanAdmin, "First account is administrator");
+                adminWelcome.SettingsCommand.Execute(); await Task.Delay(50);
+                var accountWindow=app.Windows.Cast<Window>().Single(w=>w!=window);
+                var accountView=Find<AccessPanel>(accountWindow);
+                var passwordInput=(System.Windows.Controls.PasswordBox)accountView.FindName("NewPasswordInput");
+                adminWelcome.Panel.NewName="shortpassuser"; passwordInput.Password="123456";
+                Click(accountView,App.Appearance.Text("CreateUser")); await Task.Delay(50);
+                Require(adminWelcome.Panel.HasError && adminWelcome.Panel.Message==App.Appearance.Text("InvalidPassword"),"123456 gives visible password validation instead of throwing");
+                Require(passwordInput.Password=="123456" && app.Accounts.GetUsers().Count==1 && adminWelcome.Panel.CanEdit,"Failed creation keeps input, creates no user and remains usable");
+                Capture(accountWindow,"user-password-validation.png");
+                App.Appearance.SetLanguage(true); adminWelcome.Panel.RefreshLanguage();
+                Require(adminWelcome.Panel.Message==App.Appearance.Text("InvalidPassword") && adminWelcome.Panel.Message.StartsWith("The password"),"User creation validation translates");
+                App.Appearance.SetLanguage(false); adminWelcome.Panel.RefreshLanguage(); accountWindow.Close();
                 adminWelcome.Panel.NewName = "operator";
                 adminWelcome.Panel.UpdatePassword("Demo@123");
                 await adminWelcome.Panel.CreateUserAsync();
                 Require(app.Accounts.GetUsers().Count == 2, "Administrator creates operator");
+                adminWelcome.Panel.NewName="OPERATOR"; adminWelcome.Panel.UpdatePassword("Another123");
+                Require(!await adminWelcome.Panel.CreateUserAsync() && adminWelcome.Panel.Message==App.Appearance.Text("DuplicateUser") && adminWelcome.Panel.CanEdit,"Duplicate user is caught and shown without crashing");
                 try { await app.Accounts.CreateUserAsync("OPERATOR", "Another123", UserRole.Operator); throw new Exception("Duplicate accepted"); }
                 catch (InvalidOperationException) { Console.WriteLine("PASS: duplicate account rejected"); }
                 adminWelcome.Panel.Power = "35";
@@ -83,6 +103,32 @@ internal static class Program
                 Find<JogWheel>(window).Release(); var jogX=machine.X; machine.Advance();
                 Require(machine.X==jogX && !machine.IsJogging, "Release stops jog");
                 Capture(window, "hmi-jog.png");
+                machine.BeginZJog(1); for(int i=0;i<200;i++) machine.Advance(); machine.EndJog();
+                Require(machine.Z==machine.Simulation.ZMaximum,"Z+ clamps to upper travel limit");
+                machine.BeginZJog(-1); for(int i=0;i<300;i++) machine.Advance(); machine.EndJog();
+                Require(machine.Z==machine.Simulation.ZMinimum,"Z- clamps to lower travel limit");
+                var console=Find<ControlConsole>(window);
+                var zButton=FindButtonByTag(console,"+");
+                zButton.RaiseEvent(new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice,0,System.Windows.Input.MouseButton.Left) { RoutedEvent=System.Windows.UIElement.PreviewMouseLeftButtonDownEvent });
+                machine.Advance(); Require(machine.IsJogging && machine.Z>machine.Simulation.ZMinimum,"Z button starts held motion");
+                zButton.RaiseEvent(new System.Windows.Input.MouseButtonEventArgs(System.Windows.Input.Mouse.PrimaryDevice,0,System.Windows.Input.MouseButton.Left) { RoutedEvent=System.Windows.UIElement.PreviewMouseLeftButtonUpEvent });
+                Require(!machine.IsJogging,"Z button release stops motion");
+                var stoppedZ=machine.Z; machine.Advance(); Require(machine.Z==stoppedZ,"Z release stops motion");
+                machine.ToggleFollow(); Require(machine.FollowEnabled && !machine.CanZJog,"Follow locks manual Z"); machine.ToggleFollow();
+                machine.TestEmission(); Require(!machine.LaserOn,"Closed shutter rejects emission");
+                machine.ToggleShutter(); machine.ToggleRedLight(); Require(!machine.CanTest,"Red aiming light inhibits test beam"); machine.ToggleRedLight();
+                drilling.EmitCommand.Execute(); Require(drilling.HasConfirmation && !machine.LaserOn,"Emission requires confirmation"); drilling.ConfirmCommand.Execute();
+                Require(machine.IsTesting && machine.CurrentPowerPercent==5 && !machine.CanEdit,"Timed test uses modeled power and locks edits");
+                for(int i=0;i<machine.Simulation.TestEmissionTicks;i++)machine.Advance();
+                Require(!machine.LaserOn && !machine.ShutterOpen && !machine.Busy,"Timed test closes beam and shutter automatically");
+                machine.ToggleAir(); machine.ToggleRedLight(); machine.Stop(); Require(!machine.HasOutputs,"Stop clears idle auxiliary outputs");
+                machine.ToggleShutter(); machine.TestEmission(); machine.ToggleDoor(); Require(!machine.HasOutputs && !machine.IsTesting,"Door interlock aborts test"); machine.ToggleDoor(); machine.Reset(); machine.Home(); for(int i=0;i<20;i++)machine.Advance();
+                var frameCount=machine.Completed; machine.Frame(); Require(machine.IsFraming && machine.RedLightOn && !machine.CanEdit,"Frame mode starts and locks geometry");
+                Capture(window,"hmi-frame.png");
+                for(int i=0;i<200 && machine.IsFraming;i++) { machine.Advance(); Require(!machine.LaserOn && !machine.AirOn,"Frame never enables laser or air"); }
+                Require(!machine.IsFraming && !machine.RedLightOn && machine.Completed==frameCount,"Frame completes without changing machining count");
+                machine.Frame(); machine.Stop(); Require(!machine.IsFraming && !machine.HasOutputs,"Stop cancels frame motion");
+
                 drilling.DryRunCommand.Execute(); drilling.ConfirmCommand.Execute();
                 for(int step=0;step<20;step++) machine.Advance();
                 machine.PauseResume(); var dryX=machine.X; machine.Advance();
@@ -124,6 +170,8 @@ internal static class Program
                 machine.Start(); machine.Emergency();
                 Require(machine.EmergencyLatched && machine.State == MachineState.Fault && !machine.LaserOn, "Simulated E-stop latches fault");
                 Capture(window, "main-fault.png");
+                Require(Find<HandyControl.Controls.Badge>(window)?.ShowBadge==true,"HandyControl alarm badge follows fault latch");
+                Require(machine.LaserText==App.Appearance.Text("Machine.EmissionInhibited"),"Fault status explicitly reports emission inhibited");
                 machine.Reset(); machine.Home(); for (int step = 0; step < 20; step++) machine.Advance();
                 machine.Start(); for (int step = 0; step < machine.Holes.Count * 16; step++) machine.Advance();
                 Require(machine.State == MachineState.Completed && machine.Progress == 100 && !machine.LaserOn, "All holes complete at 100 percent");
@@ -139,10 +187,10 @@ internal static class Program
                 foreach(Window popup in app.Windows) if(popup!=window) Capture(popup,"settings-panel.png");
                 var popupCount=app.Windows.Count; adminWelcome.SettingsCommand.Execute();
                 Require(app.Windows.Count==popupCount,"Settings reuses existing window");
+                foreach (var popup in app.Windows.Cast<Window>().Where(w => w != window).ToArray()) popup.Close();
                 adminWelcome.DeviceCommand.Execute(); await Task.Delay(100);
-                foreach(Window popup in app.Windows) if(popup.Title==App.Appearance.Text("Machine.NavDevice")) { Require(((System.Windows.Controls.Border)popup.Content).Child is FrameworkElement device && device.DataContext==drilling,"Device window shares live machine view model"); Capture(popup,"hmi-device.png"); }
-                adminWelcome.LogsCommand.Execute(); await Task.Delay(100);
-                foreach(Window popup in app.Windows) if(popup.Title==App.Appearance.Text("Machine.NavLogs")) Capture(popup,"hmi-logs.png");
+                Require(app.Windows.Count == 1 && ((FrameworkElement)Find<WorkspaceContentHost>(window).Content).DataContext == drilling, "Device shares central region and live machine"); Capture(window,"hmi-device.png");
+                adminWelcome.LogsCommand.Execute(); await Task.Delay(100); Require(app.Windows.Count == 1 && adminWelcome.SelectedPage == "Logs", "Logs use central region"); Capture(window,"hmi-logs.png");
                 app.Accounts.SaveRecipe("Titanium test",new ProcessParameters(35,50,100)); app.Accounts.ApplyRecipe("Titanium test");
                 Require(app.Accounts.GetRecipes().Count>=2,"Named recipe persists alongside default template");
                 var library=app.Accounts.RecipeLibrary;
@@ -177,9 +225,24 @@ internal static class Program
                 }
                 library.Apply(curveRecipe.Name); machine.RefreshRecipe();
                 adminWelcome.RecipeCommand.Execute(); await Task.Delay(100);
-                foreach(Window popup in app.Windows) if(popup.Title==App.Appearance.Text("Machine.NavRecipes")) Capture(popup,"hmi-recipes.png");
+                {
+                    var popup = window;
+                    Require(app.Windows.Count == 1, "Recipes use central region without opening windows");
+                    var number=Find<HandyControl.Controls.NumericUpDown>(popup);
+                    Require(number!=null,"Recipe uses HandyControl numeric input");
+                    var editor=(RecipeLibraryViewModel)number.DataContext;
+                    number.SetCurrentValue(HandyControl.Controls.NumericUpDown.ValueProperty,2.5);
+                    Require(double.Parse(editor.Thickness,System.Globalization.CultureInfo.InvariantCulture)==2.5 && !editor.ApplyCommand.CanExecute(),"Numeric editor updates model draft and blocks unsaved apply");
+                    number.SetCurrentValue(HandyControl.Controls.NumericUpDown.ValueProperty,-1.0);
+                    Require(number.Value==number.Minimum,"Numeric editor enforces lower bound");
+                    adminWelcome.OperationCommand.Execute(); adminWelcome.RecipeCommand.Execute();
+                    Require(ReferenceEquals(editor, adminWelcome.Recipes) && !editor.CanSelect, "Recipe draft survives page switching");
+                    editor.DiscardCommand.Execute();
+                    Capture(popup,"hmi-recipes.png");
+                }
                 App.Appearance.SetTheme(true); App.Appearance.SetLanguage(true); machine.Changed(); await Task.Delay(100);
-                foreach(Window popup in app.Windows) if(popup.Title==App.Appearance.Text("Machine.NavRecipes")) Capture(popup,"hmi-recipes-dark-english.png");
+                Capture(window,"hmi-recipes-dark-english.png");
+                window.Width=1180; window.Height=740; await Task.Delay(100); Capture(window,"hmi-recipes-minimum.png"); window.Width=1440; window.Height=920;
                 App.Appearance.SetTheme(false); App.Appearance.SetLanguage(false); machine.Changed();
                 var clockBefore=adminWelcome.ClockText; await Task.Delay(1100); Require(adminWelcome.ClockText!=clockBefore,"Top clock advances");
                 adminWelcome.OperationCommand.Execute();
@@ -194,7 +257,7 @@ internal static class Program
                 Require(HandyControl.Tools.ConfigHelper.Instance.Lang.IetfLanguageTag == "en-us", "HandyControl language synchronized");
                 Click(login, "Dark");
                 await Task.Delay(100);
-                Require(((SolidColorBrush)app.FindResource("SurfaceBrush")).Color == (Color)ColorConverter.ConvertFromString("#203342"), "Dark palette applied");
+                Require(((SolidColorBrush)app.FindResource("SurfaceBrush")).Color == (Color)ColorConverter.ConvertFromString("#203246"), "Dark palette applied");
                 Require(app.Resources.MergedDictionaries[0].Source.OriginalString.EndsWith("SkinDark.xaml"), "HandyControl dark skin synchronized");
                 Capture(window, "login-dark-english.png");
                 App.Appearance.SetTheme(false);

@@ -20,6 +20,8 @@ namespace LaserDrilling.Hmi.ViewModels
         public bool CanEdit => CanAdmin && !_busy;
         public string RoleName => App.Appearance.Text(CanAdmin ? "Administrator" : "Operator");
         public string Message => App.Appearance.Text(_message);
+        public bool HasMessage => !string.IsNullOrEmpty(_message);
+        public bool HasError => HasMessage && _message != "UserCreated" && _message != "ParametersSaved";
         public string NewName { get => _newName; set => SetProperty(ref _newName, value); }
         public bool NewAdministrator { get => _newAdministrator; set => SetProperty(ref _newAdministrator, value); }
         public ObservableCollection<UserIdentity> Users { get; } = new ObservableCollection<UserIdentity>();
@@ -41,22 +43,27 @@ namespace LaserDrilling.Hmi.ViewModels
             RefreshUsers();
         }
         public void UpdatePassword(string password) => _password = password;
-        private void Show(string key) { _message = key; RaisePropertyChanged(nameof(Message)); }
+        private void Show(string key) { _message = key; RaisePropertyChanged(nameof(Message)); RaisePropertyChanged(nameof(HasMessage)); RaisePropertyChanged(nameof(HasError)); }
         private void RefreshUsers() { if (!CanAdmin) return; Users.Clear(); foreach (var user in _accounts.GetUsers()) Users.Add(user); }
-        public async Task CreateUserAsync()
+        public async Task<bool> CreateUserAsync()
         {
-            if (!CanEdit) { Show("AccessDenied"); return; }
+            if (_busy) return false;
+            if (!CanAdmin) { Show("AccessDenied"); return false; }
+            var validationError = AccountValidation.Validate(NewName, _password);
+            if (validationError != null) { Show(validationError); return false; }
             _busy = true; RefreshCommands();
             try
             {
                 await _accounts.CreateUserAsync(NewName, _password, NewAdministrator ? UserRole.Administrator : UserRole.Operator);
                 _password = ""; NewName = ""; NewAdministrator = false; RefreshUsers(); Show("UserCreated");
+                return true;
             }
-            catch (ArgumentException ex) { Show(ex.Message); }
-            catch (InvalidOperationException ex) { Show(ex.Message); }
+            catch (ArgumentException ex) { Show(ex.Message == "InvalidUserName" || ex.Message == "InvalidPassword" ? ex.Message : "StoreError"); }
+            catch (InvalidOperationException ex) { Show(ex.Message == "DuplicateUser" ? "DuplicateUser" : "StoreError"); }
             catch (UnauthorizedAccessException) { Show("AccessDenied"); }
             catch (Exception) { Show("StoreError"); }
             finally { _busy = false; RefreshCommands(); }
+            return false;
         }
         private void RefreshCommands() { RaisePropertyChanged(nameof(CanEdit)); CreateUserCommand.RaiseCanExecuteChanged(); SaveParametersCommand.RaiseCanExecuteChanged(); }
         public void SaveParameters()

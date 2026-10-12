@@ -4,7 +4,6 @@
   <StackPanel>
    <TextBlock Text="{Binding RoleName}" FontSize="22" FontWeight="SemiBold"/>
    <TextBlock Text="{DynamicResource Text.ReadOnlyHint}" Margin="0,8,0,16" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}"/>
-   <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Margin="0,0,0,12" Foreground="{DynamicResource AccentBrush}"/>
    <Border Visibility="Collapsed" Background="{DynamicResource SurfaceBrush}" Padding="20" Margin="0,0,0,16">
     <StackPanel>
      <TextBlock Text="{DynamicResource Text.ProcessSettings}" FontSize="18" FontWeight="SemiBold"/>
@@ -21,12 +20,17 @@
     <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding CanAdmin}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Border.Style>
     <StackPanel>
      <TextBlock Text="{DynamicResource Text.UserManagement}" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+     <TextBlock Text="{DynamicResource Text.InvalidPassword}" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,0,0,12"/>
      <Grid IsEnabled="{Binding CanEdit}">
       <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
       <StackPanel Margin="0,0,14,0"><TextBlock Text="{DynamicResource Text.NewAccount}" Style="{StaticResource FieldLabel}"/><TextBox Text="{Binding NewName, UpdateSourceTrigger=PropertyChanged}"/></StackPanel>
       <StackPanel Grid.Column="1" Margin="0,0,14,0"><TextBlock Text="{DynamicResource Text.Password}" Style="{StaticResource FieldLabel}"/><PasswordBox x:Name="NewPasswordInput" PasswordChanged="OnPasswordChanged"/></StackPanel>
       <StackPanel Grid.Column="2"><CheckBox Content="{DynamicResource Text.GrantAdmin}" IsChecked="{Binding NewAdministrator}" Margin="0,0,0,8"/><Button Content="{DynamicResource Text.CreateUser}" Click="OnCreateUser" Style="{StaticResource PrimaryButton}"/></StackPanel>
      </Grid>
+     <Border Padding="12" Margin="0,12,0,0" BorderThickness="3,1,1,1" Background="{DynamicResource InputBrush}">
+      <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Style.Triggers><DataTrigger Binding="{Binding HasMessage}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger><DataTrigger Binding="{Binding HasError}" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}"/></DataTrigger></Style.Triggers></Style></Border.Style>
+      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontSize="14" FontWeight="SemiBold" AutomationProperties.LiveSetting="Assertive"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/><Style.Triggers><DataTrigger Binding="{Binding HasError}" Value="True"><Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+     </Border>
      <ItemsControl ItemsSource="{Binding Users}" Margin="0,16,0,0">
       <ItemsControl.ItemTemplate><DataTemplate><DockPanel Margin="0,4"><TextBlock Text="{Binding UserName}" Width="220"/><TextBlock><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Text" Value="{DynamicResource Text.Operator}"/><Style.Triggers><DataTrigger Binding="{Binding Role}" Value="Administrator"><Setter Property="Text" Value="{DynamicResource Text.Administrator}"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock></DockPanel></DataTemplate></ItemsControl.ItemTemplate>
      </ItemsControl>

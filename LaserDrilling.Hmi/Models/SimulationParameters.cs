@@ -3,6 +3,11 @@ namespace LaserDrilling.Hmi.Models
     // Demonstration timing and travel limits; independent of presentation and real hardware.
     public sealed record SimulationParameters
     {
+        public double ZMinimum { get; init; } = -50;
+        public double ZMaximum { get; init; } = 50;
+        public int TestEmissionTicks { get; init; } = 5;
+        public double TestPowerPercent { get; init; } = 5;
+        public double FrameSpeed { get; init; } = 40;
         public int TickMilliseconds { get; init; } = 100;
         public int HomingTicks { get; init; } = 20;
         public int TravelTicks { get; init; } = 6;

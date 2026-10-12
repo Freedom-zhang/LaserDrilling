@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
@@ -24,7 +24,7 @@ namespace LaserDrilling.Hmi.Services
             ["PasswordMismatch"] = new[] { "两次输入的密码不一致。", "Passwords do not match." },
             ["SetupCompleted"] = new[] { "管理员已创建，请重新打开登录页。", "Setup already completed. Reopen sign-in." },
             ["InvalidUserName"] = new[] { "账号需为 3–32 位字母、数字、下划线、点或短横线。", "Account: 3–32 letters, digits, underscores, dots or hyphens." },
-            ["InvalidPassword"] = new[] { "密码长度必须为 8–128 位。", "Password must contain 8–128 characters." },
+            ["InvalidPassword"] = new[] { "密码长度必须大于8位,并使用大小写字母混入。", "The password length must be more than 8 characters and should include both uppercase and lowercase letters." },
             ["DuplicateUser"] = new[] { "此账号已存在（不区分大小写）。", "This account already exists (case insensitive)." },
             ["AccessDenied"] = new[] { "当前账号无权执行此操作。", "Your account cannot perform this action." },
             ["Administrator"] = new[] { "管理员", "Administrator" },
@@ -99,15 +99,16 @@ namespace LaserDrilling.Hmi.Services
                     break;
                 }
             }
-            SetBrush("InkBrush", dark ? "#E4EDF3" : "#203D52");
-            SetBrush("MutedBrush", dark ? "#A1B4C3" : "#6B7E8C");
-            SetBrush("AccentBrush", dark ? "#208A98" : "#187F8D");
-            SetBrush("LineBrush", dark ? "#3C5162" : "#D5DFE5");
-            SetBrush("PageBrush", dark ? "#172633" : "#F4F7FA");
-            SetBrush("SurfaceBrush", dark ? "#203342" : "#FFFFFF");
-            SetBrush("InputBrush", dark ? "#152532" : "#FAFCFD");
-            SetBrush("SubtleBrush", dark ? "#293E4E" : "#EBF0F4");
-            SetBrush("ErrorBrush", dark ? "#FFABA3" : "#B23732");
+            SetBrush("InkBrush", dark ? "#F1F5FA" : "#10283D");
+            SetBrush("MutedBrush", dark ? "#C2D0DE" : "#42596B");
+            SetBrush("AccentBrush", dark ? "#57D0EE" : "#006B91");
+            SetBrush("ActionBrush", dark ? "#00698F" : "#006B91");
+            SetBrush("LineBrush", dark ? "#637B91" : "#8196A8");
+            SetBrush("PageBrush", dark ? "#101D2B" : "#DFE7EE");
+            SetBrush("SurfaceBrush", dark ? "#203246" : "#FFFFFF");
+            SetBrush("InputBrush", dark ? "#102030" : "#FFFFFF");
+            SetBrush("SubtleBrush", dark ? "#314A61" : "#DCE6F0");
+            SetBrush("ErrorBrush", dark ? "#FF9B96" : "#B8202A");
             Application.Current.Resources["Text.ThemeChoice"] = dark ? (IsEnglish ? "Light" : "浅色") : (IsEnglish ? "Dark" : "深色");
             RaisePropertyChanged(nameof(IsDark));
         }
