@@ -25,7 +25,7 @@ namespace LaserDrilling.Hmi.Views
             if (!_pages.TryGetValue(key, out var view))
             {
                 view = key == "Workspace" ? new DrillingView() : (FrameworkElement)Application.LoadComponent(new System.Uri($"/LaserDrilling.Hmi;component/Views/{key}Page.xaml", System.UriKind.Relative));
-                view.DataContext = key == "Recipes" ? vm.Recipes : key == "Logs" ? vm : vm.Operation;
+                view.DataContext = key == "Maintenance" ? vm.Maintenance : key == "Recipes" ? vm.Recipes : key == "Logs" ? vm : vm.Operation;
                 _pages.Add(key, view);
             }
             Content = view;

@@ -1,57 +1,199 @@
-<UserControl x:Class="LaserDrilling.Hmi.Views.LoginView"
- xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
- xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- xmlns:prism="http://prismlibrary.com/" prism:ViewModelLocator.AutoWireViewModel="True"
- Loaded="OnLoaded" Unloaded="OnUnloaded">
- <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Background="{DynamicResource SurfaceBrush}">
-  <Grid>
-   <Grid.ColumnDefinitions><ColumnDefinition Width="260"/><ColumnDefinition/></Grid.ColumnDefinitions>
-   <Grid Background="#203D52">
-    <StackPanel Margin="28,45,24,0" VerticalAlignment="Top">
-     <Border Background="#F4F8FA" Width="64" Height="64" HorizontalAlignment="Left" Margin="0,0,0,20"><Image Source="{StaticResource CompanyLogo}" Margin="6"/></Border>
-     <TextBlock Text="{Binding Brand.CompanyName}" Foreground="White" FontSize="25" FontWeight="SemiBold"/>
-     <TextBlock Text="{Binding Brand.CompanyEnglishName}" Foreground="#A7C3D1" FontFamily="Consolas" FontSize="13" Margin="0,8,0,0"/>
-    </StackPanel>
-    <Viewbox Width="195" Height="172" VerticalAlignment="Center" Margin="0,75,0,0" Opacity="0.8">
-     <Canvas Width="250" Height="220">
-      <Path Stroke="#48687D" StrokeThickness="1" Data="M0,110 H250 M125,0 V220 M25,30 H225 V190 H25 Z M25,70 H225 M25,150 H225 M75,30 V190 M175,30 V190"/>
-      <Path Stroke="#68B9C2" StrokeThickness="2" Data="M65,100 H85 M75,90 V110 M115,100 H135 M125,90 V110 M165,100 H185 M175,90 V110 M65,140 H85 M75,130 V150 M115,140 H135 M125,130 V150 M165,140 H185 M175,130 V150"/>
-      <Ellipse Width="30" Height="30" Canvas.Left="110" Canvas.Top="85" Stroke="#E8B063" StrokeThickness="1.5"/>
-     </Canvas>
-    </Viewbox>
-    <StackPanel Margin="28,0,24,30" VerticalAlignment="Bottom">
-     <TextBlock Text="{DynamicResource Text.Product}" Foreground="White" FontSize="17" TextWrapping="Wrap"/>
-     <TextBlock Text="PRECISION LASER PROCESSING" Foreground="#A7C3D1" FontFamily="Consolas" FontSize="10" Margin="0,12,0,0"/>
-    </StackPanel>
-   </Grid>
-   <Grid Grid.Column="1" Margin="42,60,42,22">
-    <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="25"/></Grid.RowDefinitions>
-    <StackPanel VerticalAlignment="Center">
-     <TextBlock Text="{Binding PageTitle}" FontSize="26" FontWeight="SemiBold"/>
-     <TextBlock Text="{Binding PageHint}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,8,0,22"/>
-     <TextBlock Text="{DynamicResource Text.Account}" Style="{StaticResource FieldLabel}"/>
-     <TextBox x:Name="UserNameInput" Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsIdle}" AutomationProperties.Name="{DynamicResource Text.Account}"/>
-     <TextBlock Text="{DynamicResource Text.Password}" Style="{StaticResource FieldLabel}" Margin="0,14,0,9"/>
-     <PasswordBox x:Name="PasswordInput" PasswordChanged="OnPasswordChanged" IsEnabled="{Binding IsIdle}" AutomationProperties.Name="{DynamicResource Text.Password}"/>
-     <StackPanel>
-      <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding IsSetup}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
-      <TextBlock Text="{DynamicResource Text.ConfirmPassword}" Style="{StaticResource FieldLabel}" Margin="0,12,0,6"/>
-      <PasswordBox x:Name="ConfirmationInput" PasswordChanged="OnConfirmationChanged" IsEnabled="{Binding IsIdle}"/>
-     </StackPanel>
-     <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource ErrorBrush}" FontSize="12" TextWrapping="Wrap" MinHeight="25" Margin="0,6,0,2"/>
-     <Button Content="{Binding LoginCaption}" Command="{Binding SignInCommand}" Style="{StaticResource PrimaryButton}" IsDefault="True"/>
+<UserControl
+    x:Class="LaserDrilling.Hmi.Views.LoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    Loaded="OnLoaded"
+    Unloaded="OnUnloaded">
+    <Border
+        Background="{DynamicResource SurfaceBrush}"
+        BorderBrush="{DynamicResource LineBrush}"
+        BorderThickness="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid Background="#203D52">
+                <StackPanel Margin="28,45,24,0" VerticalAlignment="Top">
+                    <Border
+                        Width="64"
+                        Height="64"
+                        Margin="0,0,0,20"
+                        HorizontalAlignment="Left"
+                        Background="#F4F8FA">
+                        <Image Margin="6" Source="{StaticResource CompanyLogo}" />
+                    </Border>
+                    <TextBlock
+                        FontSize="25"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Text="{Binding Brand.CompanyName}" />
+                    <TextBlock
+                        Margin="0,8,0,0"
+                        FontFamily="Consolas"
+                        FontSize="13"
+                        Foreground="#A7C3D1"
+                        Text="{Binding Brand.CompanyEnglishName}" />
+                </StackPanel>
+                <Viewbox
+                    Width="195"
+                    Height="172"
+                    Margin="0,75,0,0"
+                    VerticalAlignment="Center"
+                    Opacity="0.8">
+                    <Canvas Width="250" Height="220">
+                        <Path
+                            Data="M0,110 H250 M125,0 V220 M25,30 H225 V190 H25 Z M25,70 H225 M25,150 H225 M75,30 V190 M175,30 V190"
+                            Stroke="#48687D"
+                            StrokeThickness="1" />
+                        <Path
+                            Data="M65,100 H85 M75,90 V110 M115,100 H135 M125,90 V110 M165,100 H185 M175,90 V110 M65,140 H85 M75,130 V150 M115,140 H135 M125,130 V150 M165,140 H185 M175,130 V150"
+                            Stroke="#68B9C2"
+                            StrokeThickness="2" />
+                        <Ellipse
+                            Canvas.Left="110"
+                            Canvas.Top="85"
+                            Width="30"
+                            Height="30"
+                            Stroke="#E8B063"
+                            StrokeThickness="1.5" />
+                    </Canvas>
+                </Viewbox>
+                <StackPanel Margin="28,0,24,30" VerticalAlignment="Bottom">
+                    <TextBlock
+                        FontSize="17"
+                        Foreground="White"
+                        Text="{DynamicResource Text.Product}"
+                        TextWrapping="Wrap" />
+                    <TextBlock
+                        Margin="0,12,0,0"
+                        FontFamily="Consolas"
+                        FontSize="10"
+                        Foreground="#A7C3D1"
+                        Text="PRECISION LASER PROCESSING" />
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1" Margin="42,60,42,22">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="25" />
+                </Grid.RowDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock
+                        FontSize="26"
+                        FontWeight="SemiBold"
+                        Text="{Binding PageTitle}" />
+                    <TextBlock
+                        Margin="0,8,0,22"
+                        FontSize="12"
+                        Foreground="{DynamicResource MutedBrush}"
+                        Text="{Binding PageHint}"
+                        TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource Text.Account}" />
+                    <TextBox
+                        x:Name="UserNameInput"
+                        AutomationProperties.Name="{DynamicResource Text.Account}"
+                        IsEnabled="{Binding IsIdle}"
+                        Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock
+                        Margin="0,14,0,9"
+                        Style="{StaticResource FieldLabel}"
+                        Text="{DynamicResource Text.Password}" />
+                    <PasswordBox
+                        x:Name="PasswordInput"
+                        AutomationProperties.Name="{DynamicResource Text.Password}"
+                        IsEnabled="{Binding IsIdle}"
+                        PasswordChanged="OnPasswordChanged" />
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSetup}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock
+                            Margin="0,12,0,6"
+                            Style="{StaticResource FieldLabel}"
+                            Text="{DynamicResource Text.ConfirmPassword}" />
+                        <PasswordBox
+                            x:Name="ConfirmationInput"
+                            IsEnabled="{Binding IsIdle}"
+                            PasswordChanged="OnConfirmationChanged" />
+                    </StackPanel>
+                    <TextBlock
+                        MinHeight="25"
+                        Margin="0,6,0,2"
+                        FontSize="12"
+                        Foreground="{DynamicResource ErrorBrush}"
+                        Text="{Binding ErrorMessage}"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Command="{Binding SignInCommand}"
+                        Content="{Binding LoginCaption}"
+                        IsDefault="True"
+                        Style="{StaticResource PrimaryButton}" />
 
-    </StackPanel>
-    <TextBlock Grid.Row="1" Text="{DynamicResource Text.Offline}" VerticalAlignment="Bottom" Foreground="{DynamicResource MutedBrush}" FontSize="11"/>
-   </Grid>
-   <Grid Grid.ColumnSpan="2" Height="38" VerticalAlignment="Top" Background="Transparent" MouseLeftButtonDown="OnDrag">
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,5,0">
-     <Button Content="中文 / EN" Click="OnLanguage" ToolTip="{DynamicResource Text.Language}" Style="{StaticResource SecondaryButton}" Height="28" Margin="0,0,5,0" FontSize="11"/>
-     <Button Content="{DynamicResource Text.ThemeChoice}" Click="OnTheme" ToolTip="{DynamicResource Text.Theme}" Style="{StaticResource SecondaryButton}" Height="28" Margin="0,0,5,0" FontSize="11"/>
-     <Button Content="−" Click="OnMinimize" ToolTip="{DynamicResource Text.Minimize}" AutomationProperties.Name="{DynamicResource Text.Minimize}" Style="{StaticResource SecondaryButton}" Height="28" Width="40" Padding="0" Margin="0,0,5,0"/>
-     <Button Content="×" Click="OnClose" ToolTip="{DynamicResource Text.Close}" AutomationProperties.Name="{DynamicResource Text.Close}" Style="{StaticResource SecondaryButton}" Height="28" Width="40" Padding="0"/>
-    </StackPanel>
-   </Grid>
-  </Grid>
- </Border>
+                </StackPanel>
+                <TextBlock
+                    Grid.Row="1"
+                    VerticalAlignment="Bottom"
+                    FontSize="11"
+                    Foreground="{DynamicResource MutedBrush}"
+                    Text="{DynamicResource Text.Offline}" />
+            </Grid>
+            <Grid
+                Grid.ColumnSpan="2"
+                Height="38"
+                VerticalAlignment="Top"
+                Background="Transparent"
+                MouseLeftButtonDown="OnDrag">
+                <StackPanel
+                    Margin="0,4,5,0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+                    <Button
+                        Height="28"
+                        Margin="0,0,5,0"
+                        Click="OnLanguage"
+                        Content="中文 / EN"
+                        FontSize="11"
+                        Style="{StaticResource SecondaryButton}"
+                        ToolTip="{DynamicResource Text.Language}" />
+                    <Button
+                        Height="28"
+                        Margin="0,0,5,0"
+                        Click="OnTheme"
+                        Content="{DynamicResource Text.ThemeChoice}"
+                        FontSize="11"
+                        Style="{StaticResource SecondaryButton}"
+                        ToolTip="{DynamicResource Text.Theme}" />
+                    <Button
+                        Width="40"
+                        Height="28"
+                        Margin="0,0,5,0"
+                        Padding="0"
+                        AutomationProperties.Name="{DynamicResource Text.Minimize}"
+                        Click="OnMinimize"
+                        Content="−"
+                        Style="{StaticResource SecondaryButton}"
+                        ToolTip="{DynamicResource Text.Minimize}" />
+                    <Button
+                        Width="40"
+                        Height="28"
+                        Padding="0"
+                        AutomationProperties.Name="{DynamicResource Text.Close}"
+                        Click="OnClose"
+                        Content="×"
+                        Style="{StaticResource SecondaryButton}"
+                        ToolTip="{DynamicResource Text.Close}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
 </UserControl>

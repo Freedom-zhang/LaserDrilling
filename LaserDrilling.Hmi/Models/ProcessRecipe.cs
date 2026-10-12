@@ -29,9 +29,11 @@ namespace LaserDrilling.Hmi.Models
                 !Range(GasPressureBar, 0, 30) || !Range(FocusOffsetMm, -100, 100) || !Range(DwellMilliseconds, 100, 60000) || Parameters == null ||
                 !Range(Parameters.PowerPercent, 0, 100) || !Range(Parameters.FrequencyKhz, 0.001, 1000) || Parameters.PulseCount < 1 || Parameters.PulseCount > 1000000)
                 throw new ArgumentException("Machine.InvalidRecipe");
-            if (PowerCurve == null || PowerCurve.Length < 2 || PowerCurve.Length > 32 || PowerCurve.Any(p => p == null || !Range(p.Progress, 0, 100) || !Range(p.PowerPercent, 0, Parameters.PowerPercent)) ||
+            if (PowerCurve == null || PowerCurve.Length < 2 || PowerCurve.Length > 32 || PowerCurve.Any(p => p == null || !Range(p.Progress, 0, 100) || !Range(p.PowerPercent, 0, 100)) ||
                 PowerCurve[0].Progress != 0 || PowerCurve[^1].Progress != 100 || PowerCurve.Zip(PowerCurve.Skip(1)).Any(p => p.First.Progress >= p.Second.Progress))
                 throw new ArgumentException("Machine.InvalidCurve");
+            if (PowerCurve.Any(p => p.PowerPercent > Parameters.PowerPercent))
+                throw new ArgumentException("Machine.CurvePowerExceeded");
         }
         public double PowerAt(double progress)
         {

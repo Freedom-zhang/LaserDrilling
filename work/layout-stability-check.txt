@@ -1,0 +1,235 @@
+PASS: Startup view visible
+PASS: HandyControl loading animation active
+PASS: Navigated to login
+PASS: Default splash duration near 2 seconds: 2.49
+PASS: Compact borderless login window
+PASS: First run requires administrator creation
+PASS: No prior login leaves remembered account empty
+PASS: Confirmation mismatch does not create administrator
+PASS: First account is administrator
+PASS: Successful account survives service restart
+PASS: Console disabled while settings window is open
+PASS: 123456 gives visible password validation instead of throwing
+PASS: Failed creation keeps input, creates no user and remains usable
+PASS: User creation validation translates
+PASS: Console restores on workspace after settings closes
+PASS: Administrator creates operator
+PASS: Duplicate user is caught and shown without crashing
+PASS: duplicate account rejected
+PASS: Account persists and case-insensitive login works
+PASS: Parameters survive service restart
+PASS: No plaintext passwords stored
+PASS: first-run setup cannot be repeated
+PASS: invalid process parameters rejected
+PASS: Cycle cannot start before homing
+PASS: Homing requires confirmation
+PASS: Homing enables cycle start
+PASS: Jogging preserves wheel position and scale: False / (1440, 920)
+PASS: Jog release preserves wheel position and scale
+PASS: Cycle start preserves console layout
+PASS: Jogging preserves wheel position and scale: False / (1180, 740)
+PASS: Jog release preserves wheel position and scale
+PASS: Cycle start preserves console layout
+PASS: Jogging preserves wheel position and scale: True / (1440, 920)
+PASS: Jog release preserves wheel position and scale
+PASS: Cycle start preserves console layout
+PASS: Jogging preserves wheel position and scale: True / (1180, 740)
+PASS: Jog release preserves wheel position and scale
+PASS: Cycle start preserves console layout
+PASS: Editing setpoints does not immediately change running configuration
+PASS: Apply uses edited session setpoints
+PASS: Session setpoints do not overwrite recipe file
+PASS: Start retains applied setpoints and locks editing
+PASS: Stopped readbacks are zero
+PASS: Wheel diagonal moves both axes with normalized velocity
+PASS: Release stops jog
+PASS: Z+ clamps to upper travel limit
+PASS: Z- clamps to lower travel limit
+PASS: Z button starts held motion
+PASS: Z button release stops motion
+PASS: Z release stops motion
+PASS: Follow locks manual Z
+PASS: Closed shutter rejects emission
+PASS: Red aiming light inhibits test beam
+PASS: Emission requires confirmation
+PASS: Timed test uses modeled power and locks edits
+PASS: Timed test closes beam and shutter automatically
+PASS: Stop clears idle auxiliary outputs
+PASS: Door interlock aborts test
+PASS: Frame mode starts and locks geometry
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame never enables laser or air
+PASS: Frame completes without changing machining count
+PASS: Stop cancels frame motion
+PASS: Dry run pause holds position with outputs off
+PASS: Dry run outputs OFF for entire cycle
+PASS: Dry run visits every hole
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Dry run does not mark hole machined
+PASS: Cancel start leaves machine ready
+PASS: Cycle simulates beam and locks geometry
+PASS: Settings and logout locked during cycle
+PASS: Pause stops beam and motion
+PASS: Door fault stops cycle and invalidates reference
+PASS: Open door blocks fault reset
+PASS: Reset does not auto restart or home
+PASS: Simulated E-stop latches fault
+PASS: HandyControl alarm badge follows fault latch
+PASS: Fault status explicitly reports emission inhibited
+PASS: All holes complete at 100 percent
+PASS: Administrator can change hole count
+PASS: Immediate stop closes beam
+PASS: Settings reuses existing window
+PASS: Device page disables console including jog controls
+PASS: Device shares central region and live machine
+PASS: Device telemetry mirrors axis coordinates
+PASS: Device telemetry follows gas output
+PASS: Stopped telemetry has zero gas pressure and beam power
+PASS: Maintenance uses central view
+PASS: Power and emission meters are separate
+PASS: Empty maintenance note does not create record
+PASS: Service record retains lifetime meters
+PASS: Maintenance history and meters persist
+PASS: Maintenance entry locked during operation
+PASS: Logs use central region
+PASS: Selected log row/cell has readable colors in both themes
+PASS: Log text remains white after focus moves away
+PASS: Selected log row/cell has readable colors in both themes
+PASS: Log text remains white after focus moves away
+PASS: Named recipe persists alongside default template
+PASS: Saving a file does not switch active recipe
+PASS: Recipe test reopens account
+PASS: File metadata, curve and active selection survive restart
+PASS: Applied snapshot survives overwrite of library file
+PASS: Simulation interpolates varying per-hole power
+PASS: Paused power is zero
+PASS: Dry run ignores power curve and keeps outputs off
+PASS: Empty library generates actual default JSON file
+PASS: Invalid files are reported while valid files load
+PASS: duplicate/missing curve endpoints rejected
+PASS: Editor saves independent material file and curve nodes
+PASS: Apply explicitly sets one active recipe
+PASS: Unsaved edits cannot be applied
+PASS: Recipes use central region without opening windows
+PASS: Recipe uses HandyControl numeric input
+PASS: Numeric editor updates model draft and blocks unsaved apply
+PASS: Numeric editor enforces lower bound
+PASS: Recipe draft survives page switching
+PASS: Top clock advances
+PASS: Workspace restores console navigation gate
+PASS: Logout prefills last successful administrator
+PASS: Empty password rejected
+PASS: Existing validation and command captions translate immediately
+PASS: HandyControl language synchronized
+PASS: Dark palette applied
+PASS: HandyControl dark skin synchronized
+PASS: HandyControl light skin restored
+PASS: Wrong password rejected
+PASS: Failed operator login does not overwrite remembered administrator
+PASS: Correct demo login enters welcome
+PASS: Main system restores normal window
+PASS: Username passed through Prism navigation
+PASS: Next successful account replaces remembered account
+PASS: Operator parameter editing disabled
+PASS: operator recipe save rejected
+PASS: operator recipe apply rejected
+PASS: operator geometry edit rejected
+PASS: service rejects operator user creation
+PASS: service rejects operator parameter changes
+PASS: Unauthorized change did not alter stored parameters
+PASS: Logout returns to login
+PASS: Logout clears authenticated session
+PASS: Logout restores compact borderless window
+PASS: Logout clears password
+PASS: all startup/login smoke checks

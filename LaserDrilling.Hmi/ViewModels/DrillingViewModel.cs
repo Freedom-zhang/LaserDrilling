@@ -10,6 +10,30 @@ namespace LaserDrilling.Hmi.ViewModels
     public sealed class DrillingViewModel : BindableBase, IDisposable
     {
         public MockDrillingMachine Machine { get; }
+        public ProcessSetpoints Setpoints { get; } = new();
+        private bool _loadingSetpoints, _setpointsDirty;
+        private ProcessParameters _loadedParameters;
+        public DelegateCommand ApplySetpointsCommand { get; }
+        public DelegateCommand ReloadSetpointsCommand { get; }
+        public string SetpointHint => App.Appearance.Text("Machine." + (_setpointsDirty ? "SetpointsDraft" : "SetpointsApplied"));
+        private void LoadSetpoints()
+        {
+            _loadingSetpoints = true; _loadedParameters = Machine.ConfiguredParameters;
+            Setpoints.Power = _loadedParameters.PowerPercent; Setpoints.Frequency = _loadedParameters.FrequencyKhz; Setpoints.Pulses = _loadedParameters.PulseCount; Setpoints.Cycles = Machine.ConfiguredCycles;
+            _loadingSetpoints = false; _setpointsDirty = false; RaisePropertyChanged(nameof(SetpointHint)); ApplySetpointsCommand?.RaiseCanExecuteChanged();
+        }
+        private void SetpointsChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_loadingSetpoints) return;
+            _setpointsDirty = true; RaisePropertyChanged(nameof(SetpointHint)); ApplySetpointsCommand.RaiseCanExecuteChanged();
+        }
+        private void ApplySetpoints()
+        {
+            try { Machine.ApplySetpoints(Setpoints.ToParameters(), Setpoints.Cycles); LoadSetpoints(); }
+            catch (UnauthorizedAccessException) { _notice = "AccessDenied"; }
+            catch (ArgumentException) { _notice = "Machine.InvalidRecipe"; }
+            RaisePropertyChanged(nameof(Notice));
+        }
         private DrillHole _selected;
         public DrillHole Selected { get => _selected; set { if (SetProperty(ref _selected, value) && value != null) { HoleX = value.X.ToString(CultureInfo.InvariantCulture); HoleY = value.Y.ToString(CultureInfo.InvariantCulture); Diameter = value.Diameter.ToString(CultureInfo.InvariantCulture); Depth = value.Depth.ToString(CultureInfo.InvariantCulture); RaisePropertyChanged(""); Machine.Changed(); } } }
         public string HoleX { get; set; } = "50";
@@ -20,6 +44,11 @@ namespace LaserDrilling.Hmi.ViewModels
         public bool HasConfirmation => _pending != "";
         public string Confirmation => HasConfirmation ? App.Appearance.Text("Machine.Confirm" + _pending) : "";
         public string Notice => _notice == "" ? "" : App.Appearance.Text(_notice);
+        public string ShutterCaption => App.Appearance.Text("Machine." + (Machine.ShutterOpen ? "ShutterOnCaption" : "ShutterOffCaption"));
+        public string FollowCaption => App.Appearance.Text("Machine." + (Machine.FollowEnabled ? "FollowOnCaption" : "FollowOffCaption"));
+        private string AuxiliaryBlock => !Machine.DoorClosed || Machine.EmergencyLatched || Machine.State == MachineState.Fault ? "AuxFaultHint" : Machine.Busy || Machine.IsJogging ? "AuxBusyHint" : null;
+        public string ShutterHint => App.Appearance.Text("Machine." + (AuxiliaryBlock ?? (Machine.ShutterOpen ? "ShutterOpened" : "ShutterClosed")));
+        public string FollowHint => AuxiliaryBlock != null ? App.Appearance.Text("Machine." + AuxiliaryBlock) : !Machine.Homed ? App.Appearance.Text("Machine.FollowHomeHint") : string.Format(App.Appearance.Text("Machine.FollowTargetHint"), Machine.FollowTargetZ);
         public string PauseCaption => App.Appearance.Text(Machine.State == MachineState.Paused ? "Machine.Resume" : "Machine.Pause");
         public DelegateCommand ShutterCommand { get; }
         public DelegateCommand RedLightCommand { get; }
@@ -44,6 +73,9 @@ namespace LaserDrilling.Hmi.ViewModels
         public DrillingViewModel(IAccountService accounts)
         {
             Machine = new MockDrillingMachine(accounts);
+            ApplySetpointsCommand = new DelegateCommand(ApplySetpoints, () => Machine.CanEdit && _setpointsDirty);
+            ReloadSetpointsCommand = new DelegateCommand(LoadSetpoints);
+            LoadSetpoints(); Setpoints.PropertyChanged += SetpointsChanged;
             ShutterCommand = new DelegateCommand(Machine.ToggleShutter, () => Machine.CanAuxiliary);
             RedLightCommand = new DelegateCommand(Machine.ToggleRedLight, () => Machine.CanAuxiliary);
             AirCommand = new DelegateCommand(Machine.ToggleAir, () => Machine.CanAuxiliary);
@@ -84,11 +116,15 @@ namespace LaserDrilling.Hmi.ViewModels
         }
         private void OnMachineChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (!_setpointsDirty && _loadedParameters != Machine.ConfiguredParameters) LoadSetpoints();
+            ApplySetpointsCommand.RaiseCanExecuteChanged(); RaisePropertyChanged(nameof(SetpointHint));
+            RaisePropertyChanged(nameof(ShutterCaption)); RaisePropertyChanged(nameof(FollowCaption));
+            RaisePropertyChanged(nameof(ShutterHint)); RaisePropertyChanged(nameof(FollowHint));
             foreach (var command in new[] { ShutterCommand, RedLightCommand, AirCommand, FollowCommand, EmitCommand, FrameCommand }) command.RaiseCanExecuteChanged();
             DryRunCommand.RaiseCanExecuteChanged();
             HomeCommand.RaiseCanExecuteChanged(); StartCommand.RaiseCanExecuteChanged(); PauseCommand.RaiseCanExecuteChanged(); StopCommand.RaiseCanExecuteChanged(); ResetCommand.RaiseCanExecuteChanged(); JogCommand.RaiseCanExecuteChanged();
             AddCommand.RaiseCanExecuteChanged(); ApplyCommand.RaiseCanExecuteChanged(); DeleteCommand.RaiseCanExecuteChanged(); RaisePropertyChanged(nameof(PauseCaption));
         }
-        public void Dispose() { Machine.PropertyChanged -= OnMachineChanged; Machine.Dispose(); }
+        public void Dispose() { Setpoints.PropertyChanged -= SetpointsChanged; Machine.PropertyChanged -= OnMachineChanged; Machine.Dispose(); }
     }
 }

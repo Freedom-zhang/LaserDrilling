@@ -1,10 +1,1050 @@
-<Grid xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:hc="https://handyorg.github.io/handycontrol" Margin="24">
- <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
- <StackPanel><TextBlock Text="{DynamicResource Text.Machine.NavDevice}" FontSize="24" FontWeight="SemiBold"/><TextBlock Text="{DynamicResource Text.Machine.Mock}" Margin="0,8,0,20" Foreground="{DynamicResource MutedBrush}"/></StackPanel>
- <Border Grid.Row="1" Background="{DynamicResource SurfaceBrush}" Padding="24"><StackPanel>
-  <hc:Tag DataContext="{Binding Machine}" Content="{Binding StateText}" Style="{StaticResource MotionStateTag}" FontSize="20" Margin="0,0,0,24"/>
-  <UniformGrid Columns="2" Rows="5" Height="180"><TextBlock Text="{DynamicResource Text.Machine.Laser}"/><TextBlock Text="{Binding Machine.LaserText}"/><TextBlock Text="{DynamicResource Text.Machine.Air}"/><TextBlock Text="{Binding Machine.AirText}"/><TextBlock Text="{DynamicResource Text.Machine.Motion}"/><TextBlock Text="{Binding Machine.ReferenceText}"/><TextBlock Text="{DynamicResource Text.Machine.Door}"/><TextBlock Text="{Binding Machine.DoorText}"/><TextBlock Text="{DynamicResource Text.Machine.Cooling}"/><TextBlock Text="{Binding Machine.Simulation.ChillerCelsius, StringFormat={}{0:F1} °C / MOCK}"/></UniformGrid>
-  <Separator Margin="0,20"/><TextBlock Text="{Binding Machine.ModeText}" FontWeight="SemiBold"/>
- </StackPanel></Border>
- <UniformGrid Grid.Row="2" Columns="3" Margin="0,20,0,0"><Button Content="{DynamicResource Text.Machine.DoorTest}" Command="{Binding DoorCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/><Button Content="{DynamicResource Text.Machine.Reset}" Command="{Binding ResetCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/><Button Content="{DynamicResource Text.Machine.Emergency}" Command="{Binding EmergencyCommand}" Style="{StaticResource PrimaryButton}" Background="#AC3539"/></UniformGrid>
+<Grid
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Margin="12">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition />
+        <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <DockPanel Margin="4,0,4,12">
+        <TextBlock
+            VerticalAlignment="Center"
+            DockPanel.Dock="Right"
+            FontSize="11"
+            Foreground="{DynamicResource MutedBrush}"
+            Text="{DynamicResource Text.Machine.Mock}" />
+        <TextBlock
+            FontSize="22"
+            FontWeight="SemiBold"
+            Text="{DynamicResource Text.Machine.NavDevice}" />
+    </DockPanel>
+    <ScrollViewer
+        Grid.Row="1"
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto">
+        <UniformGrid Columns="3">
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Device}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagBed}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagBed0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.ControllerModel}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagBed1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.RigidityLevel}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagBed2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.FirmwareVersion}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagBed3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.X, StringFormat={}{0:F3} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagBed4}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.Y, StringFormat={}{0:F3} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagBed5}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.Z, StringFormat={}{0:F3} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagBed6}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.TrackingErrorMm, StringFormat={}{0:F3} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Settings}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagIo}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagIo0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.IoModules}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagIo1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.InputPorts}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagIo2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.OutputPorts}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagIo3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.ActiveInputs}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagIo4}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.ActiveOutputs}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagIo5}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DoorText}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Device}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagHeight}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHeight0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.HeightControllerVersion}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHeight1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.FollowLevel}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHeight2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.CalibrationRangeMm, StringFormat={}{0:F2} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHeight3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.CapacitancePf, StringFormat={}{0:F2} pF}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHeight4}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.HeightDeviationMm, StringFormat={}{0:F3} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHeight5}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.LastCalibration}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Workspace}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagHead}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHead0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.HeadModel}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHead1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.FocusRange}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHead2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.FocusMm, StringFormat={}{0:F3} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHead3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.SpotDiameterMm, StringFormat={}{0:F3} mm}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagHead4}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.ReferenceText}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Workspace}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagLaserUnit}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagLaserUnit0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.LaserModel}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagLaserUnit1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.RatedPowerW, StringFormat={}{0:F1} W}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagLaserUnit2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.PowerPercent, StringFormat={}{0:F1} %}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagLaserUnit3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.SimulatedPowerW, StringFormat={}{0:F1} W}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagLaserUnit4}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.FrequencyKhz, StringFormat={}{0:F3} kHz}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagLaserUnit5}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.LaserText}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Recipe}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagGasUnit}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagGasUnit0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.GasPressureLimitBar, StringFormat={}{0:F1} bar}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagGasUnit1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.ValveRange}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagGasUnit2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.GasType}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagGasUnit3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.GasPressureBar, StringFormat={}{0:F2} bar}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagGasUnit4}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.AirText}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Workspace}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagVision}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagVision0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.CameraModel}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagVision1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.CameraCount}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagVision2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.CameraResolution}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagVision3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.ExposureMs, StringFormat={}{0:F1} ms}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Margin="4"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource LineBrush}"
+                BorderThickness="1">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <Path
+                            Width="28"
+                            Height="28"
+                            Data="{StaticResource Icon.Device}"
+                            DockPanel.Dock="Right"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentBrush}"
+                            StrokeThickness="1.6" />
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="{DynamicResource Text.Machine.DiagPeripheral}" />
+                    </DockPanel>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagPeripheral0}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.PeripheralModel}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagPeripheral1}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.WaterTemperatureC, StringFormat={}{0:F1} °C}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagPeripheral2}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.WaterFlowLpm, StringFormat={}{0:F1} L/min}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                    <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="1.15*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="0,0,8,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource MutedBrush}"
+                            Text="{DynamicResource Text.Machine.DiagPeripheral3}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Column="1"
+                            FontSize="12"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource InkBrush}"
+                            Text="{Binding Machine.DeviceStatus.SupplyVoltageV, StringFormat={}{0:F1} V}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+    </ScrollViewer>
+    <UniformGrid
+        Grid.Row="2"
+        Margin="4,12,4,0"
+        Columns="3">
+        <Button
+            Margin="0,0,8,0"
+            Command="{Binding DoorCommand}"
+            Content="{DynamicResource Text.Machine.DoorTest}"
+            Style="{StaticResource SecondaryButton}" />
+        <Button
+            Margin="0,0,8,0"
+            Command="{Binding ResetCommand}"
+            Content="{DynamicResource Text.Machine.Reset}"
+            Style="{StaticResource SecondaryButton}" />
+        <Button
+            Background="#AC3539"
+            Command="{Binding EmergencyCommand}"
+            Content="{DynamicResource Text.Machine.Emergency}"
+            Style="{StaticResource PrimaryButton}" />
+    </UniformGrid>
 </Grid>

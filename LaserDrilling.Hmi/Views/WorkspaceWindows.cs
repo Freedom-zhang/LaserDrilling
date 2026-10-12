@@ -22,9 +22,10 @@ namespace LaserDrilling.Hmi.Views
             window.SetResourceReference(Window.BackgroundProperty, "PageBrush");
             window.SetResourceReference(Window.ForegroundProperty, "InkBrush");
             window.SetResourceReference(Window.TitleProperty, "Text.Machine.Nav" + key);
-            window.Closed += (_, _) => { _windows.Remove(key); (contentContext as IDisposable)?.Dispose(); if (key == "Settings") context.Panel?.Clear(); };
+            window.Closed += (_, _) => { _windows.Remove(key); (contentContext as IDisposable)?.Dispose(); if (key == "Settings") { context.Panel?.Clear(); context.SetSettingsOpen(false); } };
             _windows.Add(key, window);
             window.Show();
+            if (key == "Settings") context.SetSettingsOpen(true);
         }
         public void CloseAll() { foreach (var window in new List<Window>(_windows.Values)) window.Close(); }
     }

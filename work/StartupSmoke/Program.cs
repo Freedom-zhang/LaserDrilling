@@ -47,6 +47,7 @@ internal static class Program
                 Require(window.WindowStyle == WindowStyle.None && window.Width == 760 && window.Height == 540, "Compact borderless login window");
                 var setup = (LoginViewModel)login.DataContext;
                 Require(setup.IsSetup, "First run requires administrator creation");
+                Require(app.Accounts.LastSignedInUserName == "", "No prior login leaves remembered account empty");
                 Capture(window, "account-setup.png");
                 setup.UpdatePassword("AdminTest123");
                 setup.UpdateConfirmation("mismatch");
@@ -57,8 +58,10 @@ internal static class Program
                 await Task.Delay(100);
                 var adminWelcome = (WelcomeViewModel)Find<WelcomeView>(window).DataContext;
                 Require(adminWelcome.Panel.CanAdmin, "First account is administrator");
+                Require(new LocalAccountService(app.StorePath).LastSignedInUserName == "admin", "Successful account survives service restart");
                 adminWelcome.SettingsCommand.Execute(); await Task.Delay(50);
                 var accountWindow=app.Windows.Cast<Window>().Single(w=>w!=window);
+                Require(!Find<ControlConsole>(window).IsEnabled, "Console disabled while settings window is open");
                 var accountView=Find<AccessPanel>(accountWindow);
                 var passwordInput=(System.Windows.Controls.PasswordBox)accountView.FindName("NewPasswordInput");
                 adminWelcome.Panel.NewName="shortpassuser"; passwordInput.Password="123456";
@@ -69,6 +72,7 @@ internal static class Program
                 App.Appearance.SetLanguage(true); adminWelcome.Panel.RefreshLanguage();
                 Require(adminWelcome.Panel.Message==App.Appearance.Text("InvalidPassword") && adminWelcome.Panel.Message.StartsWith("The password"),"User creation validation translates");
                 App.Appearance.SetLanguage(false); adminWelcome.Panel.RefreshLanguage(); accountWindow.Close();
+                Require(Find<ControlConsole>(window).IsEnabled, "Console restores on workspace after settings closes");
                 adminWelcome.Panel.NewName = "operator";
                 adminWelcome.Panel.UpdatePassword("Demo@123");
                 await adminWelcome.Panel.CreateUserAsync();
@@ -97,6 +101,56 @@ internal static class Program
                 drilling.ConfirmCommand.Execute();
                 for (int step = 0; step < 20; step++) machine.Advance();
                 Require(machine.Homed && machine.CanStart, "Homing enables cycle start");
+                // A changing hint must not move or resize the wheel underneath a held pointer.
+                foreach (var english in new[] { false, true })
+                {
+                    App.Appearance.SetLanguage(english);
+                    foreach (var size in new[] { (1440d, 920d), (1180d, 740d) })
+                    {
+                        window.Width=size.Item1; window.Height=size.Item2; window.UpdateLayout();
+                        var wheel=Find<JogWheel>(window);
+                        Rect WheelBounds() => wheel.TransformToAncestor(window).TransformBounds(new Rect(wheel.RenderSize));
+                        var idleBounds=WheelBounds();
+                        machine.BeginJog(1,0); machine.Advance(); window.UpdateLayout();
+                        Require(WheelBounds()==idleBounds,"Jogging preserves wheel position and scale: " + english + " / " + size);
+                        machine.EndJog(); window.UpdateLayout();
+                        Require(WheelBounds()==idleBounds,"Jog release preserves wheel position and scale");
+                        machine.Start(); machine.Advance(); window.UpdateLayout();
+                        Require(WheelBounds()==idleBounds,"Cycle start preserves console layout");
+                        machine.Stop(); window.UpdateLayout();
+                    }
+                }
+                App.Appearance.SetLanguage(false); window.Width=1440; window.Height=920;
+                machine.Home(); for(int step=0;step<20;step++) machine.Advance();
+                machine.RefreshRecipe(); var originalSetpoints=machine.ConfiguredParameters;
+                drilling.Setpoints.Power=30; drilling.Setpoints.Frequency=40; drilling.Setpoints.Pulses=120;
+                Require(machine.ConfiguredParameters==originalSetpoints,"Editing setpoints does not immediately change running configuration");
+                drilling.ApplySetpointsCommand.Execute();
+                Require(machine.ConfiguredParameters.PowerPercent==30 && machine.ConfiguredParameters.PulseCount==120,"Apply uses edited session setpoints");
+                Require(app.Accounts.RecipeLibrary.GetActive().Parameters==originalSetpoints,"Session setpoints do not overwrite recipe file");
+                machine.Start(); for(int i=0;i<8;i++)machine.Advance();
+                Require(machine.ConfiguredParameters.FrequencyKhz==40 && machine.ActualFrequencyKhz==40 && !drilling.ApplySetpointsCommand.CanExecute(),"Start retains applied setpoints and locks editing");
+                machine.Stop(); Require(machine.ActualFrequencyKhz==0 && machine.CurrentPowerPercent==0,"Stopped readbacks are zero");
+                machine.ApplySetpoints(originalSetpoints);
+
+                drilling.Setpoints.Cycles=2; drilling.ApplySetpointsCommand.Execute();
+                Require(machine.ConfiguredCycles==2,"Apply saves target cycles");
+                machine.Start();
+                for(int i=0;i<10000 && machine.Cycles.Completed==0;i++) machine.Advance();
+                Require(machine.Cycles.Completed==1 && machine.State==MachineState.Running && machine.Completed==0 && machine.Progress==50,"First full hole list increments count and starts second cycle");
+                machine.PauseResume(); machine.Advance();
+                Require(machine.Cycles.Completed==1 && machine.State==MachineState.Paused,"Pause preserves cycle count");
+                machine.PauseResume();
+                for(int i=0;i<10000 && machine.State==MachineState.Running;i++) machine.Advance();
+                Require(machine.Cycles.Completed==2 && machine.Progress==100 && machine.State==MachineState.Completed && !machine.HasOutputs,"Target cycles finishes automatically with outputs closed");
+                machine.Start(); machine.Advance(); machine.Stop();
+                Require(machine.Cycles.Completed==0,"Interrupted partial cycle does not increment count and restart resets count");
+                machine.StartDryRun();
+                for(int i=0;i<10000 && machine.State==MachineState.Running;i++) { machine.Advance(); if(machine.LaserOn || machine.AirOn) throw new Exception("Repeated preview enabled output"); }
+                Require(machine.Cycles.IsPreview && machine.Cycles.Completed==2,"Dry run counts are labelled preview");
+                try { machine.ApplySetpoints(originalSetpoints,0); throw new Exception("Invalid cycle count accepted"); } catch(ArgumentException) { }
+                drilling.Setpoints.Cycles=1; drilling.ApplySetpointsCommand.Execute();
+                machine.Home(); for(int i=0;i<20;i++) machine.Advance();
                 machine.BeginJog(1, 1);
                 for (int step = 0; step < 15; step++) machine.Advance();
                 Require(machine.X > 5 && machine.Y > 5 && Math.Abs(machine.X-machine.Y)<0.001, "Wheel diagonal moves both axes with normalized velocity");
@@ -189,8 +243,49 @@ internal static class Program
                 Require(app.Windows.Count==popupCount,"Settings reuses existing window");
                 foreach (var popup in app.Windows.Cast<Window>().Where(w => w != window).ToArray()) popup.Close();
                 adminWelcome.DeviceCommand.Execute(); await Task.Delay(100);
+                Require(!Find<ControlConsole>(window).IsEnabled && !Find<JogWheel>(window).IsEnabled, "Device page disables console including jog controls");
                 Require(app.Windows.Count == 1 && ((FrameworkElement)Find<WorkspaceContentHost>(window).Content).DataContext == drilling, "Device shares central region and live machine"); Capture(window,"hmi-device.png");
+                Require(machine.DeviceStatus.X == machine.X && machine.DeviceStatus.Z == machine.Z, "Device telemetry mirrors axis coordinates");
+                machine.ToggleAir(); Require(machine.DeviceStatus.GasPressureBar > 0 && machine.DeviceStatus.ActiveOutputs > 0, "Device telemetry follows gas output"); machine.Stop();
+                Require(machine.DeviceStatus.GasPressureBar == 0 && machine.DeviceStatus.SimulatedPowerW == 0, "Stopped telemetry has zero gas pressure and beam power");
+                App.Appearance.SetTheme(true); App.Appearance.SetLanguage(true); machine.Changed(); await Task.Delay(100); Capture(window,"hmi-device-dark.png");
+                window.Width=1180; window.Height=740; await Task.Delay(100); Capture(window,"hmi-device-minimum.png");
+                window.Width=1440; window.Height=920; App.Appearance.SetTheme(false); App.Appearance.SetLanguage(false); machine.Changed();
+                adminWelcome.MaintenanceCommand.Execute(); await Task.Delay(100);
+                Require(app.Windows.Count == 1 && adminWelcome.SelectedPage == "Maintenance", "Maintenance uses central view");
+                var maintenance = machine.Maintenance;
+                var beforePower=maintenance.Data.PowerSeconds; var beforeBeam=maintenance.Data.EmissionSeconds;
+                maintenance.Accumulate(2,false,true,false);
+                Require(maintenance.Data.PowerSeconds==beforePower+2 && maintenance.Data.EmissionSeconds==beforeBeam,"Power and emission meters are separate");
+                var recordsBefore=maintenance.Data.Records.Count;
+                adminWelcome.Maintenance.Note=""; adminWelcome.Maintenance.RecordCommand.Execute();
+                Require(maintenance.Data.Records.Count==recordsBefore,"Empty maintenance note does not create record");
+                adminWelcome.Maintenance.Note="Cleaned lens and checked cooling / MOCK";
+                adminWelcome.Maintenance.SelectedItem="LensService"; adminWelcome.Maintenance.RecordCommand.Execute();
+                Require(maintenance.Data.Records.Count==recordsBefore+1 && maintenance.Data.PowerSeconds>=beforePower+2,"Service record retains lifetime meters");
+                var reloadedMaintenance=new MaintenanceService(app.Accounts);
+                Require(reloadedMaintenance.Data.Records.Count==maintenance.Data.Records.Count && reloadedMaintenance.Data.EmissionSeconds==maintenance.Data.EmissionSeconds,"Maintenance history and meters persist");
+                Capture(window,"hmi-maintenance.png");
+                machine.Start(); Require(!adminWelcome.Maintenance.RecordCommand.CanExecute(),"Maintenance entry locked during operation"); machine.Stop();
                 adminWelcome.LogsCommand.Execute(); await Task.Delay(100); Require(app.Windows.Count == 1 && adminWelcome.SelectedPage == "Logs", "Logs use central region"); Capture(window,"hmi-logs.png");
+                {
+                    var logGrid=Find<System.Windows.Controls.DataGrid>(Find<WorkspaceContentHost>(window));
+                    logGrid.SelectedItem=machine.Events.First(e=>e.Level=="ALARM"); logGrid.ScrollIntoView(logGrid.SelectedItem); logGrid.UpdateLayout();
+                    var selectedRow=(System.Windows.Controls.DataGridRow)logGrid.ItemContainerGenerator.ContainerFromItem(logGrid.SelectedItem);
+                    selectedRow.Focus(); await Task.Delay(60);
+                    foreach(var dark in new[] { false, true })
+                    {
+                        App.Appearance.SetTheme(dark); await Task.Delay(60);
+                        var cell=Find<System.Windows.Controls.DataGridCell>(selectedRow);
+                        Require(((SolidColorBrush)selectedRow.Background).Color==(Color)ColorConverter.ConvertFromString("#075A88") && ((SolidColorBrush)cell.Foreground).Color==Colors.White,"Selected log row/cell has readable colors in both themes");
+                        Capture(window,dark ? "hmi-logs-selected-dark.png" : "hmi-logs-selected-light.png");
+                        Find<JogWheel>(window).Focus(); await Task.Delay(60);
+                        Require(((SolidColorBrush)cell.Foreground).Color==Colors.White,"Log text remains white after focus moves away");
+                        Capture(window,dark ? "hmi-logs-inactive-dark.png" : "hmi-logs-inactive-light.png");
+                    }
+                    App.Appearance.SetTheme(false);
+                }
+
                 app.Accounts.SaveRecipe("Titanium test",new ProcessParameters(35,50,100)); app.Accounts.ApplyRecipe("Titanium test");
                 Require(app.Accounts.GetRecipes().Count>=2,"Named recipe persists alongside default template");
                 var library=app.Accounts.RecipeLibrary;
@@ -220,6 +315,14 @@ internal static class Program
                     editor.NewCommand.Execute(); editor.Name="Aluminum_2mm_DEMO"; editor.Material="Aluminum"; editor.Thickness="2";
                     editor.MovePoint(1,30,30); editor.Save();
                     Require(library.LoadAll().Any(r=>r.Name=="Aluminum_2mm_DEMO" && r.ThicknessMm==2 && r.PowerCurve[1].Progress==30),"Editor saves independent material file and curve nodes");
+                    editor.Power="20"; editor.MovePoint(1,30,90.89);
+                    Require(editor.CurveWarning.Contains("90.89") && editor.CurveWarning.Contains("20"),"Curve warns immediately with actual peak and limit");
+                    editor.Save();
+                    Require(editor.Message==editor.CurveWarning && !editor.CanSelect && editor.Points[1].PowerPercent==90.89,"Rejected save explains power limit and preserves draft");
+                    Require(library.LoadAll().Single(r=>r.Name=="Aluminum_2mm_DEMO").PowerCurve[1].PowerPercent==30,"Rejected curve does not overwrite file");
+                    editor.Power="95";
+                    Require(editor.CurveWarning=="","Corrected limit clears live warning");
+                    editor.Save(); Require(editor.CanSelect && library.LoadAll().Single(r=>r.Name=="Aluminum_2mm_DEMO").PowerCurve[1].PowerPercent==90.89,"Corrected curve saves successfully");
                     editor.Apply(); Require(machine.ActiveRecipeName=="Aluminum_2mm_DEMO","Apply explicitly sets one active recipe");
                     editor.Power="40"; Require(!editor.ApplyCommand.CanExecute(),"Unsaved edits cannot be applied");
                 }
@@ -246,10 +349,13 @@ internal static class Program
                 App.Appearance.SetTheme(false); App.Appearance.SetLanguage(false); machine.Changed();
                 var clockBefore=adminWelcome.ClockText; await Task.Delay(1100); Require(adminWelcome.ClockText!=clockBefore,"Top clock advances");
                 adminWelcome.OperationCommand.Execute();
+                Require(Find<ControlConsole>(window).IsEnabled, "Workspace restores console navigation gate");
                 adminWelcome.SignOutCommand.Execute();
                 await Task.Delay(100);
                 login = Find<LoginView>(window);
                 var vm = (LoginViewModel)login.DataContext;
+                Require(vm.UserName == "admin", "Logout prefills last successful administrator");
+                vm.UserName = "operator";
                 await vm.SignInAsync();
                 Require(vm.HasError, "Empty password rejected");
                 Click(login, "中文 / EN");
@@ -272,6 +378,7 @@ internal static class Program
                 vm.UpdatePassword("wrong");
                 await vm.SignInAsync();
                 Require(vm.HasError && Find<LoginView>(window) != null, "Wrong password rejected");
+                Require(new LocalAccountService(app.StorePath).LastSignedInUserName == "admin", "Failed operator login does not overwrite remembered administrator");
                 vm.UpdatePassword("Demo@123");
                 await vm.SignInAsync();
                 await Task.Delay(100);
@@ -280,6 +387,7 @@ internal static class Program
                 Require(window.WindowStyle == WindowStyle.SingleBorderWindow && window.Width >= 1180, "Main system restores normal window");
                 var welcomeVm = (WelcomeViewModel)welcome.DataContext;
                 Require(welcomeVm.UserName == "operator", "Username passed through Prism navigation");
+                Require(new LocalAccountService(app.StorePath).LastSignedInUserName == "operator", "Next successful account replaces remembered account");
                 Require(!welcomeVm.Panel.CanAdmin && !welcomeVm.Panel.SaveParametersCommand.CanExecute(), "Operator parameter editing disabled");
                 try { app.Accounts.SaveRecipe("Unauthorized",new ProcessParameters(50,50,100)); throw new Exception("Operator saved recipe"); } catch(UnauthorizedAccessException) { Console.WriteLine("PASS: operator recipe save rejected"); }
                 try { app.Accounts.ApplyRecipe("Titanium test"); throw new Exception("Operator applied recipe"); } catch(UnauthorizedAccessException) { Console.WriteLine("PASS: operator recipe apply rejected"); }

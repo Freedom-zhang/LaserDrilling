@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
@@ -24,7 +24,16 @@ namespace LaserDrilling.Hmi.ViewModels
         public DelegateCommand DiscardCommand { get; }
         public string ActiveName => _machine.ActiveRecipeName;
         public string LoadWarning { get; private set; } = "";
-        public string Message => _message=="" ? "" : App.Appearance.Text(_message);
+        public string Message => _message=="" ? "" : _message=="Machine.CurvePowerExceeded" ? CurveWarning : App.Appearance.Text(_message);
+        public string CurveWarning
+        {
+            get
+            {
+                if (!double.TryParse(Power, NumberStyles.Float, CultureInfo.InvariantCulture, out var limit) || !double.IsFinite(limit) || Points.Count==0) return "";
+                var peak=Points.Max(p=>p.PowerPercent);
+                return peak>limit ? string.Format(App.Appearance.Text("Machine.CurvePowerExceeded"), peak, limit) : "";
+            }
+        }
         public string EditStatus => App.Appearance.Text(_dirty ? "Machine.Unsaved" : "Machine.SavedFile");
         public int Revision => _revision;
         public bool CanEdit => _accounts.CurrentUser?.Role==UserRole.Administrator && !_machine.Busy && !_machine.IsJogging;
@@ -119,7 +128,7 @@ namespace LaserDrilling.Hmi.ViewModels
             progress=index==0?0:index==Points.Count-1?100:Math.Clamp(progress,Points[index-1].Progress+0.01,Points[index+1].Progress-0.01);
             Points[index]=new PowerPoint(Math.Round(progress,2),Math.Round(Math.Clamp(power,0,100),2)); SelectedPoint=Points[index]; Dirty();
         }
-        private void OnState(object sender,PropertyChangedEventArgs e) { RaisePropertyChanged(nameof(CanEdit)); RaisePropertyChanged(nameof(ActiveName)); RaisePropertyChanged(nameof(Message)); RaisePropertyChanged(nameof(EditStatus)); RefreshCommands(); }
+        private void OnState(object sender,PropertyChangedEventArgs e) { RaisePropertyChanged(nameof(CanEdit)); RaisePropertyChanged(nameof(ActiveName)); RaisePropertyChanged(nameof(Message)); RaisePropertyChanged(nameof(CurveWarning)); RaisePropertyChanged(nameof(EditStatus)); RefreshCommands(); }
         public void Dispose()=>_machine.PropertyChanged-=OnState;
         private string _name="";
         public string Name { get=>_name; set { if(SetProperty(ref _name,value)) Dirty(); } }

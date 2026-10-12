@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,6 +16,7 @@ namespace LaserDrilling.Hmi.Services
     {
         IRecipeFileService RecipeLibrary { get; }
         bool NeedsSetup { get; }
+        string LastSignedInUserName { get; }
         UserIdentity CurrentUser { get; }
         Task<bool> SignInAsync(string userName, string password, CancellationToken token);
         Task InitializeAdministratorAsync(string name, string password, CancellationToken token);
@@ -38,6 +39,17 @@ namespace LaserDrilling.Hmi.Services
         private IRecipeFileService _recipes;
         public IRecipeFileService RecipeLibrary { get { lock (_gate) { RequireLogin(); return _recipes ??= new RecipeFileService(Path.GetDirectoryName(_path), () => CurrentUser, Read().Parameters, Read().Recipes); } } }
         public UserIdentity CurrentUser { get { lock (_gate) return _current; } }
+        public string LastSignedInUserName
+        {
+            get
+            {
+                lock (_gate)
+                {
+                    var state = Read();
+                    return state.Users.FirstOrDefault(u => string.Equals(u.Name, state.LastSignedInUserName, StringComparison.OrdinalIgnoreCase))?.Name ?? "";
+                }
+            }
+        }
         public bool NeedsSetup { get { lock (_gate) return Read().Users.Count == 0; } }
         public LocalAccountService() : this(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LaserDrilling", "accounts.json")) { }
         public LocalAccountService(string path) { _path = path; }
@@ -53,7 +65,15 @@ namespace LaserDrilling.Hmi.Services
                 var actual = Rfc2898DeriveBytes.Pbkdf2(password, Convert.FromBase64String(user.Salt), Iterations, HashAlgorithmName.SHA256, 32);
                 var valid = CryptographicOperations.FixedTimeEquals(actual, Convert.FromBase64String(user.Hash));
                 token.ThrowIfCancellationRequested();
-                if (valid) _current = new UserIdentity(user.Name, user.Role);
+                if (valid)
+                {
+                    using var lease = AcquireWriteLock();
+                    var state = Read();
+                    token.ThrowIfCancellationRequested();
+                    state.LastSignedInUserName = user.Name;
+                    Write(state);
+                    _current = new UserIdentity(user.Name, user.Role);
+                }
                 return valid;
             }
         }, token);
@@ -135,6 +155,7 @@ namespace LaserDrilling.Hmi.Services
         }
         public sealed class AccountStore
         {
+            public string LastSignedInUserName { get; set; } = "";
             public List<AccountEntry> Users { get; set; } = new List<AccountEntry>();
             public ProcessParameters Parameters { get; set; } = new ProcessParameters(20, 50, 100);
             public List<ProcessRecipe> Recipes { get; set; } = new List<ProcessRecipe>();

@@ -14,7 +14,7 @@ namespace LaserDrilling.Hmi.ViewModels
         private readonly IAccountService _authentication;
         private readonly IRegionManager _regions;
         private CancellationTokenSource _pendingLogin;
-        private string _userName = "operator";
+        private string _userName = "";
         private string _password = "";
         private string _errorMessage = "";
         private bool _isBusy;
@@ -40,7 +40,7 @@ namespace LaserDrilling.Hmi.ViewModels
             Brand = options;
             _authentication = authentication;
             IsSetup = authentication.NeedsSetup;
-            if (IsSetup) _userName = "admin";
+            _userName = IsSetup ? "admin" : authentication.LastSignedInUserName;
             SignInCommand = new DelegateCommand(async () => await SignInAsync(), () => !IsBusy);
         }
         private void OnAppearanceChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

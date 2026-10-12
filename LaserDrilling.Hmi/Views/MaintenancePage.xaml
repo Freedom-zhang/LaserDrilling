@@ -1,0 +1,215 @@
+<Grid
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Margin="16">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition />
+    </Grid.RowDefinitions>
+    <StackPanel Margin="0,0,0,12">
+        <TextBlock
+            FontSize="22"
+            FontWeight="SemiBold"
+            Text="{DynamicResource Text.Machine.NavMaintenance}" />
+        <TextBlock
+            Margin="0,8,0,0"
+            FontSize="11"
+            Foreground="{DynamicResource MutedBrush}"
+            Text="{DynamicResource Text.Machine.MaintenanceHint}"
+            TextWrapping="Wrap" />
+        <TextBlock
+            Margin="0,8,0,0"
+            Foreground="{DynamicResource AccentBrush}"
+            Text="{Binding Message}"
+            TextWrapping="Wrap" />
+    </StackPanel>
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <UniformGrid Columns="2">
+                <Border
+                    Margin="3"
+                    Padding="12"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource LineBrush}"
+                    BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Text.Machine.PowerTime}" />
+                        <TextBlock
+                            FontFamily="Consolas"
+                            FontSize="26"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource AccentBrush}"
+                            Text="{Binding PowerTime}" />
+                        <TextBlock FontSize="10" Text="h : min : s" />
+                    </StackPanel>
+                </Border>
+                <Border
+                    Margin="3"
+                    Padding="12"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource LineBrush}"
+                    BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Text.Machine.EmissionTime}" />
+                        <TextBlock
+                            FontFamily="Consolas"
+                            FontSize="26"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource AccentBrush}"
+                            Text="{Binding EmissionTime}" />
+                        <TextBlock FontSize="10" Text="h : min : s" />
+                    </StackPanel>
+                </Border>
+                <Border
+                    Margin="3"
+                    Padding="12"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource LineBrush}"
+                    BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Text.Machine.MotionTime}" />
+                        <TextBlock
+                            FontFamily="Consolas"
+                            FontSize="26"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource AccentBrush}"
+                            Text="{Binding MotionTime}" />
+                        <TextBlock FontSize="10" Text="h : min : s" />
+                    </StackPanel>
+                </Border>
+                <Border
+                    Margin="3"
+                    Padding="12"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource LineBrush}"
+                    BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Text.Machine.GasTime}" />
+                        <TextBlock
+                            FontFamily="Consolas"
+                            FontSize="26"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource AccentBrush}"
+                            Text="{Binding GasTime}" />
+                        <TextBlock FontSize="10" Text="h : min : s" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+            <DataGrid
+                Height="160"
+                Margin="3,12,3,12"
+                AutoGenerateColumns="False"
+                Background="{DynamicResource SurfaceBrush}"
+                CanUserAddRows="False"
+                ColumnHeaderHeight="32"
+                Foreground="{DynamicResource InkBrush}"
+                HeadersVisibility="Column"
+                IsReadOnly="True"
+                ItemsSource="{Binding Schedules}"
+                RowBackground="{DynamicResource SurfaceBrush}"
+                RowHeight="30">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="*" Binding="{Binding Name}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceItem}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Interval}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceInterval}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Used}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceUsed}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Remaining}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceRemaining}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Status}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceStatus}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Border
+                Margin="3"
+                Padding="12"
+                Background="{DynamicResource SurfaceBrush}">
+                <StackPanel IsEnabled="{Binding CanRecord}">
+                    <TextBlock Text="{DynamicResource Text.Machine.MaintenanceItem}" />
+                    <ComboBox
+                        Margin="0,6,0,10"
+                        SelectedValue="{Binding SelectedItem}"
+                        SelectedValuePath="Tag">
+                        <ComboBoxItem Content="{DynamicResource Text.Machine.LaserService}" Tag="LaserService" />
+                        <ComboBoxItem Content="{DynamicResource Text.Machine.LensService}" Tag="LensService" />
+                        <ComboBoxItem Content="{DynamicResource Text.Machine.MotionService}" Tag="MotionService" />
+                        <ComboBoxItem Content="{DynamicResource Text.Machine.CoolingService}" Tag="CoolingService" />
+                    </ComboBox>
+                    <TextBlock Text="{DynamicResource Text.Machine.MaintenanceNote}" />
+                    <TextBox
+                        Height="65"
+                        Margin="0,6,0,10"
+                        AcceptsReturn="True"
+                        MaxLength="500"
+                        Text="{Binding Note, UpdateSourceTrigger=PropertyChanged}"
+                        TextWrapping="Wrap" />
+                    <Button
+                        Command="{Binding RecordCommand}"
+                        Content="{DynamicResource Text.Machine.MaintenanceRecord}"
+                        Style="{StaticResource PrimaryButton}" />
+                </StackPanel>
+            </Border>
+            <TextBlock
+                Margin="3,16,0,0"
+                FontWeight="SemiBold"
+                Text="{DynamicResource Text.Machine.MaintenanceHistory}" />
+            <DataGrid
+                Height="220"
+                Margin="3,12,3,12"
+                AutoGenerateColumns="False"
+                Background="{DynamicResource SurfaceBrush}"
+                CanUserAddRows="False"
+                ColumnHeaderHeight="32"
+                Foreground="{DynamicResource InkBrush}"
+                HeadersVisibility="Column"
+                IsReadOnly="True"
+                ItemsSource="{Binding Records}"
+                RowBackground="{DynamicResource SurfaceBrush}"
+                RowHeight="30">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="*" Binding="{Binding Time}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceDate}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Name}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceItem}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding User}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceUser}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Meter}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceMeter}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Binding="{Binding Note}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="{DynamicResource Text.Machine.MaintenanceNote}" TextWrapping="Wrap" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+    </ScrollViewer>
+</Grid>
