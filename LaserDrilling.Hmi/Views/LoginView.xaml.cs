@@ -24,10 +24,13 @@ namespace LaserDrilling.Hmi.Views
         {
             if (DataContext is LoginViewModel vm) vm.UpdatePassword(PasswordInput.Password);
         }
+        private void OnConfirmationChanged(object sender, RoutedEventArgs e)
+        { if (DataContext is LoginViewModel vm) vm.UpdateConfirmation(ConfirmationInput.Password); }
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is LoginViewModel vm) vm.ClearSensitiveData();
             PasswordInput.Clear();
+            ConfirmationInput.Clear();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace LaserDrilling.Hmi.ViewModels
 {
     public sealed class LoginViewModel : BindableBase, INavigationAware, IRegionMemberLifetime
     {
-        private readonly IDemoAuthenticationService _authentication;
+        private readonly IAccountService _authentication;
         private readonly IRegionManager _regions;
         private CancellationTokenSource _pendingLogin;
         private string _userName = "operator";
@@ -19,25 +19,32 @@ namespace LaserDrilling.Hmi.ViewModels
         private string _errorMessage = "";
         private bool _isBusy;
         public StartupOptions Brand { get; }
+        public bool IsSetup { get; private set; }
+        private string _confirmation = "";
+        public void UpdateConfirmation(string value) => _confirmation = value;
+        public string PageTitle => App.Appearance.Text(IsSetup ? "SetupTitle" : "LoginTitle");
+        public string PageHint => App.Appearance.Text(IsSetup ? "SetupHint" : "LoginSubtitle");
         public string UserName { get => _userName; set { SetProperty(ref _userName, value); ErrorMessage = ""; } }
         public string ErrorMessage { get => App.Appearance.Text(_errorMessage); private set { if (SetProperty(ref _errorMessage, value)) RaisePropertyChanged(nameof(HasError)); } }
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
         public bool IsBusy { get => _isBusy; private set { if (SetProperty(ref _isBusy, value)) { RaisePropertyChanged(nameof(IsIdle)); RaisePropertyChanged(nameof(LoginCaption)); SignInCommand.RaiseCanExecuteChanged(); } } }
         public bool IsIdle => !IsBusy;
-        public string LoginCaption => App.Appearance.Text(IsBusy ? "SigningIn" : "SignIn");
+        public string LoginCaption => App.Appearance.Text(IsBusy ? "SigningIn" : (IsSetup ? "SetupAction" : "SignIn"));
         public bool KeepAlive => false;
         public DelegateCommand SignInCommand { get; }
 
-        public LoginViewModel(IRegionManager regions, StartupOptions options, IDemoAuthenticationService authentication)
+        public LoginViewModel(IRegionManager regions, StartupOptions options, IAccountService authentication)
         {
             _regions = regions;
             System.ComponentModel.PropertyChangedEventManager.AddHandler(App.Appearance, OnAppearanceChanged, "");
             Brand = options;
             _authentication = authentication;
+            IsSetup = authentication.NeedsSetup;
+            if (IsSetup) _userName = "admin";
             SignInCommand = new DelegateCommand(async () => await SignInAsync(), () => !IsBusy);
         }
         private void OnAppearanceChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        { RaisePropertyChanged(nameof(ErrorMessage)); RaisePropertyChanged(nameof(LoginCaption)); }
+        { RaisePropertyChanged(nameof(ErrorMessage)); RaisePropertyChanged(nameof(LoginCaption)); RaisePropertyChanged(nameof(PageTitle)); RaisePropertyChanged(nameof(PageHint)); }
         // PasswordBox event bridge; never logged or persisted.
         public void UpdatePassword(string password) { _password = password ?? ""; ErrorMessage = ""; }
         public async Task SignInAsync()
@@ -51,6 +58,13 @@ namespace LaserDrilling.Hmi.ViewModels
             _pendingLogin = request;
             try
             {
+                if (IsSetup)
+                {
+                    if (_password != _confirmation) { ErrorMessage = "PasswordMismatch"; return; }
+                    await _authentication.InitializeAdministratorAsync(UserName.Trim(), _password, request.Token);
+                    IsSetup = false;
+                    RaisePropertyChanged(nameof(IsSetup)); RaisePropertyChanged(nameof(PageTitle)); RaisePropertyChanged(nameof(PageHint));
+                }
                 if (!await _authentication.SignInAsync(UserName.Trim(), _password, request.Token))
                 {
                     ErrorMessage = "InvalidCredentials";
@@ -64,6 +78,8 @@ namespace LaserDrilling.Hmi.ViewModels
                 }, parameters);
             }
             catch (OperationCanceledException) { }
+            catch (ArgumentException ex) { ErrorMessage = ex.Message; }
+            catch (InvalidOperationException) { ErrorMessage = "SetupCompleted"; }
             catch (Exception) { ErrorMessage = "ServiceError"; }
             finally
             {
@@ -72,7 +88,7 @@ namespace LaserDrilling.Hmi.ViewModels
                 IsBusy = false;
             }
         }
-        public void ClearSensitiveData() { _pendingLogin?.Cancel(); _password = ""; }
+        public void ClearSensitiveData() { _pendingLogin?.Cancel(); _password = ""; _confirmation = ""; }
         public void OnNavigatedTo(NavigationContext navigationContext) { }
         public bool IsNavigationTarget(NavigationContext navigationContext) => false;
         public void OnNavigatedFrom(NavigationContext navigationContext) => ClearSensitiveData();

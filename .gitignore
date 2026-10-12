@@ -25,6 +25,11 @@ TestResults/
 
 # Generated UI previews; keep the smoke-check source
 work/previews/
+work/pdf/
+work/main-ui-error.txt
+work/main-test-error.txt
+accounts.json
+accounts.json.lock
 
 # Local secrets and publish profiles
 .env

@@ -25,7 +25,7 @@ namespace LaserDrilling.Hmi
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance(StartupOptions.Load());
-            containerRegistry.RegisterSingleton<IDemoAuthenticationService, DemoAuthenticationService>();
+            containerRegistry.RegisterInstance<IAccountService>(new LocalAccountService());
             containerRegistry.RegisterForNavigation<SplashView, SplashViewModel>();
             containerRegistry.RegisterForNavigation<LoginView, LoginViewModel>();
             containerRegistry.RegisterForNavigation<WelcomeView, WelcomeViewModel>();

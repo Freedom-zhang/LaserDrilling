@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace LaserDrilling.Hmi.Services
 {
-    // Temporary UI demonstration only. Replace with real identity verification later.
+    // Historical teaching example only. No longer registered or used by the application.
+    // Active authentication and authorization live in IAccountService / LocalAccountService.
     public interface IDemoAuthenticationService
     {
         Task<bool> SignInAsync(string userName, string password, CancellationToken cancellationToken);
@@ -14,7 +15,7 @@ namespace LaserDrilling.Hmi.Services
         public async Task<bool> SignInAsync(string userName, string password, CancellationToken cancellationToken)
         {
             await Task.Delay(250, cancellationToken);
-            return string.Equals(userName, "operator", StringComparison.OrdinalIgnoreCase) && password == "Demo@123";
+            return string.Equals(userName, "operator", StringComparison.OrdinalIgnoreCase) && password == "123456";
         }
     }
 }

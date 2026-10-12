@@ -27,21 +27,20 @@
    <Grid Grid.Column="1" Margin="42,60,42,22">
     <Grid.RowDefinitions><RowDefinition/><RowDefinition Height="25"/></Grid.RowDefinitions>
     <StackPanel VerticalAlignment="Center">
-     <TextBlock Text="{DynamicResource Text.LoginTitle}" FontSize="26" FontWeight="SemiBold"/>
-     <TextBlock Text="{DynamicResource Text.LoginSubtitle}" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,8,0,22"/>
+     <TextBlock Text="{Binding PageTitle}" FontSize="26" FontWeight="SemiBold"/>
+     <TextBlock Text="{Binding PageHint}" TextWrapping="Wrap" Foreground="{DynamicResource MutedBrush}" FontSize="12" Margin="0,8,0,22"/>
      <TextBlock Text="{DynamicResource Text.Account}" Style="{StaticResource FieldLabel}"/>
      <TextBox x:Name="UserNameInput" Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding IsIdle}" AutomationProperties.Name="{DynamicResource Text.Account}"/>
      <TextBlock Text="{DynamicResource Text.Password}" Style="{StaticResource FieldLabel}" Margin="0,14,0,9"/>
      <PasswordBox x:Name="PasswordInput" PasswordChanged="OnPasswordChanged" IsEnabled="{Binding IsIdle}" AutomationProperties.Name="{DynamicResource Text.Password}"/>
+     <StackPanel>
+      <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding IsSetup}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
+      <TextBlock Text="{DynamicResource Text.ConfirmPassword}" Style="{StaticResource FieldLabel}" Margin="0,12,0,6"/>
+      <PasswordBox x:Name="ConfirmationInput" PasswordChanged="OnConfirmationChanged" IsEnabled="{Binding IsIdle}"/>
+     </StackPanel>
      <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource ErrorBrush}" FontSize="12" TextWrapping="Wrap" MinHeight="25" Margin="0,6,0,2"/>
      <Button Content="{Binding LoginCaption}" Command="{Binding SignInCommand}" Style="{StaticResource PrimaryButton}" IsDefault="True"/>
-     <Border Background="{DynamicResource SubtleBrush}" Padding="12,10" Margin="0,16,0,0">
-      <StackPanel>
-       <TextBlock Text="{DynamicResource Text.DemoTitle}" FontSize="11" FontWeight="SemiBold"/>
-       <TextBlock Text="operator / Demo@123" FontSize="12" FontFamily="Consolas" Margin="0,5,0,0"/>
-       <TextBlock Text="{DynamicResource Text.DemoNote}" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="0,5,0,0" TextWrapping="Wrap"/>
-      </StackPanel>
-     </Border>
+
     </StackPanel>
     <TextBlock Grid.Row="1" Text="{DynamicResource Text.Offline}" VerticalAlignment="Bottom" Foreground="{DynamicResource MutedBrush}" FontSize="11"/>
    </Grid>

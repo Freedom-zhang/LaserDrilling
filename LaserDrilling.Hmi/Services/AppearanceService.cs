@@ -11,8 +11,39 @@ namespace LaserDrilling.Hmi.Services
     {
         public bool IsEnglish { get; private set; }
         public bool IsDark { get; private set; }
+        public AppearanceService()
+        {
+            foreach (var entry in MachineVocabulary.All) _texts["Machine." + entry.Key] = entry.Value;
+        }
         private readonly Dictionary<string, string[]> _texts = new Dictionary<string, string[]>
         {
+            ["SetupTitle"] = new[] { "创建管理员", "Create administrator" },
+            ["SetupHint"] = new[] { "首次运行：设置管理员账号和密码（至少 8 位）。", "First run: create an administrator. Password: 8+ characters." },
+            ["SetupAction"] = new[] { "创建并登录", "Create and sign in" },
+            ["ConfirmPassword"] = new[] { "确认密码", "Confirm password" },
+            ["PasswordMismatch"] = new[] { "两次输入的密码不一致。", "Passwords do not match." },
+            ["SetupCompleted"] = new[] { "管理员已创建，请重新打开登录页。", "Setup already completed. Reopen sign-in." },
+            ["InvalidUserName"] = new[] { "账号需为 3–32 位字母、数字、下划线、点或短横线。", "Account: 3–32 letters, digits, underscores, dots or hyphens." },
+            ["InvalidPassword"] = new[] { "密码长度必须为 8–128 位。", "Password must contain 8–128 characters." },
+            ["DuplicateUser"] = new[] { "此账号已存在（不区分大小写）。", "This account already exists (case insensitive)." },
+            ["AccessDenied"] = new[] { "当前账号无权执行此操作。", "Your account cannot perform this action." },
+            ["Administrator"] = new[] { "管理员", "Administrator" },
+            ["Operator"] = new[] { "操作员", "Operator" },
+            ["UserManagement"] = new[] { "用户管理", "User management" },
+            ["NewAccount"] = new[] { "新增账号", "New account" },
+            ["GrantAdmin"] = new[] { "授予管理员权限", "Grant administrator access" },
+            ["CreateUser"] = new[] { "新增用户", "Create user" },
+            ["UserCreated"] = new[] { "用户已创建，可以使用新账号登录。", "User created. The new account can now sign in." },
+            ["StoreError"] = new[] { "保存失败，请检查数据目录或稍后重试。", "Save failed. Check the data folder or retry later." },
+            ["ProcessSettings"] = new[] { "工艺参数", "Process parameters" },
+            ["Power"] = new[] { "功率比例（%）", "Power (%)" },
+            ["Frequency"] = new[] { "频率（kHz）", "Frequency (kHz)" },
+            ["Pulses"] = new[] { "脉冲数量", "Pulse count" },
+            ["SaveParameters"] = new[] { "保存参数", "Save parameters" },
+            ["ParametersSaved"] = new[] { "参数已保存到本机，未下发设备。", "Parameters saved locally. Nothing sent to hardware." },
+            ["InvalidParameters"] = new[] { "有效范围：功率 0–100，频率大于 0 且不超过 1000，脉冲数 1–1000000。", "Ranges: power 0–100, frequency >0 to 1000, pulses 1–1000000." },
+            ["ReadOnlyHint"] = new[] { "操作员仅可查看；用户管理和参数修改需要管理员权限。", "Operators have read-only access. Changes require an administrator." },
+            ["ParameterHint"] = new[] { "模拟工艺参数，范围仅用于界面校验，不代表设备规格。", "Simulated parameters. Validation ranges are not hardware specifications." },
             ["LoginTitle"] = new[] { "系统登录", "Sign in" },
             ["LoginSubtitle"] = new[] { "请输入账号和密码，进入系统。", "Enter your credentials to continue." },
             ["Account"] = new[] { "账号", "Account" },
