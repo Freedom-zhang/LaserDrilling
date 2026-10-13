@@ -19,9 +19,11 @@ namespace LaserDrilling.Hmi.Services
             var path = Path.Combine(AppContext.BaseDirectory, "Configuration", "startup.json");
             try
             {
-                var options = File.Exists(path)
-                    ? JsonSerializer.Deserialize<StartupOptions>(File.ReadAllText(path)) ?? new StartupOptions()
-                    : new StartupOptions();
+                // 优先使用外部配置；单文件发布时读取内嵌配置。
+                using var stream = File.Exists(path)
+                    ? File.OpenRead(path)
+                    : typeof(StartupOptions).Assembly.GetManifestResourceStream("LaserDrilling.StartupDefaults.json");
+                var options = stream == null ? new StartupOptions() : JsonSerializer.Deserialize<StartupOptions>(stream) ?? new StartupOptions();
                 if (!double.IsFinite(options.SplashDurationSeconds) || options.SplashDurationSeconds < 0 || options.SplashDurationSeconds > 30)
                     options.SplashDurationSeconds = 2;
                 if (string.IsNullOrWhiteSpace(options.CompanyName)) options.CompanyName = "XX激光";

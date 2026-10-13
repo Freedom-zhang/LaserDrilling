@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="Configuration\startup.json" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Configuration\startup.json" LogicalName="LaserDrilling.StartupDefaults.json" />
   </ItemGroup>
 </Project>

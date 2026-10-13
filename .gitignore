@@ -6,7 +6,9 @@
 *.userosscache
 *.sln.docstates
 
+
 # .NET build outputs
+output/
 **/[Bb]in/
 **/[Oo]bj/
 [Aa]rtifacts/
@@ -15,6 +17,7 @@ TestResults/
 *.trx
 *.coverage
 *.coveragexml
+
 
 # Local backups and temporary files
 *.tmp
@@ -26,6 +29,7 @@ TestResults/
 # Generated UI previews; keep the smoke-check source
 work/previews/
 work/pdf/
+work/document-qa/
 work/main-ui-error.txt
 work/main-test-error.txt
 accounts.json
